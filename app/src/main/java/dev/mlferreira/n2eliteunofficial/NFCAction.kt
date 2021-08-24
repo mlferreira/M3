@@ -1,15 +1,17 @@
 package dev.mlferreira.n2eliteunofficial
 
 enum class NFCAction {
+    NONE,
+    BANK_COUNT,
+    LOCK,
+    UNLOCK,
+
     ACTION_DUMP,
     ACTION_ID,
-    ACTION_LOCK,
-    ACTION_NONE,
     ACTION_APDU,
     ACTION_SETBANKCOUNT,
     ACTION_ACTIVATE,
     ACTION_BACKUP,
-    ACTION_UNLOCK,
     ACTION_WRITE,
     ACTION_EMPTY,
     ACTION_RANDMOIZE_SERIAL,

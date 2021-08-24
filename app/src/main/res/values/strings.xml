@@ -1,7 +1,11 @@
 <resources>
-    <string name="app_name">AA N2 Elite (Unofficial Patch)</string>
+    <string name="app_name">N2 Elite (Unofficial Patch)</string>
     <string name="welcome_message">Welcome!</string>
     <string name="enable_nfc_message">NFC must be enabled!</string>
     <string name="scan_tag_message">Please, scan your tag to start.</string>
     <string name="version">2.2.1 (unofficial patch)</string>
+    <string name="tag_id">Tag ID: %1$s</string>
+    <string name="current_bank">Current active bank: %1$d (%2$s)</string>
+    <string name="bank_count">Number of banks: %1$d</string>
+    <string name="tap_and_hold">Tap and hold your tag to save changes</string>
 </resources>

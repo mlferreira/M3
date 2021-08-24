@@ -16,7 +16,7 @@ class Amiibo (
 
     var tampered = false
     var imageUrl: String? = null
-    var name: String = "UNKNOWN"
+    var name: String = "?"
 
     val gameSeriesHex: String = hexId.substring(0, 3)
     val gameSeriesId: Int = parseLong(gameSeriesHex, 16).toInt()

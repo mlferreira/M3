@@ -83,10 +83,6 @@ class MainActivity : AppCompatActivity() {
             val nfcNtag: NfcNtag = NfcNtag(nfcTag)
             intent.putExtra("tag", nfcTag)
 
-            Toast
-                .makeText(this, "processing nfc", Toast.LENGTH_LONG)
-                .show()
-
             startActivity(intent)
 
         }

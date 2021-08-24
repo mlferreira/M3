@@ -26,13 +26,8 @@ class NFCActivity : AppCompatActivity() {
     var nfcNtag: NfcNtag? = null
     private var nfcTag: Tag? = null
 
-
-
-    private var nfcAdapter: NfcAdapter? = null
     private var nfcPendingIntent: PendingIntent? = null
-
     private val writeTagFilters = mutableListOf<IntentFilter>()
-
 
 
     private var currentBank: Int = -1
@@ -60,13 +55,31 @@ class NFCActivity : AppCompatActivity() {
         nfcTag = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG)
 
         if (nfcTag == null) {
-            Toast
-                .makeText(this, "nfcTag is null????", Toast.LENGTH_LONG)
-                .show()
+            Toast.makeText(this, "nfcTag is null", Toast.LENGTH_LONG).show()
         }
 
-        getTagInfo()
+        handleNFC()
 
+    }
+
+    fun handleNFC(intent: Intent? = null) {
+        when(app.currentAction) {
+            NFCAction.BANK_COUNT -> {
+                Toast.makeText(this, "set bank count", Toast.LENGTH_LONG).show()
+                try {
+                    if (nfcNtag!!.amiiboSetBankcount(pickerValue) == null) {
+                        showErrorAndReturn("ERROR: Failed to set bank count! Please try again.")
+                        return
+                    }
+                    app.currentAction = NFCAction.NONE
+                    findViewById<TextView>(R.id.alert_tap).visibility = View.GONE
+                } catch (unused: IllegalStateException) {
+//                    showErrorAndReturn("Please try scanning again.")
+                }
+            }
+            else -> {}
+        }
+        getTagInfo()
     }
 
     fun getTagInfo() {
@@ -76,7 +89,7 @@ class NFCActivity : AppCompatActivity() {
         nfcNtag?.connect()
 
         if (nfcNtag?.version == null) {
-            showErrorAndReturn("ERROR: Unsupported NFC tag found!")
+            reconnectTag()
         }
 
         val info = this.nfcNtag!!.amiiboGetVersion()
@@ -89,139 +102,28 @@ class NFCActivity : AppCompatActivity() {
 
         currentBank = info[0].toInt()
         numBanks = info[1].toInt()
+        val tagID = nfcNtag?.amiiboReadSig()?.toHex()
 
-        findViewById<TextView>(R.id.teste_numbanks).text = "Number of banks = $numBanks"
-        findViewById<TextView>(R.id.teste_curbank).text = "Current bank = $currentBank"
+        findViewById<TextView>(R.id.text_tag_id).text = getString(R.string.tag_id, tagID)
+        findViewById<TextView>(R.id.text_bank_count).text = getString(R.string.bank_count, numBanks)
+        findViewById<TextView>(R.id.text_current_bank).text = getString(R.string.current_bank, currentBank, "?")
 
 
         for (i in 0..numBanks) {
             val amiiboHex = nfcNtag?.amiiboFastRead(21, 22, i)
-            Toast.makeText(this, "read bank $amiiboHex", Toast.LENGTH_LONG).show()
             if (amiiboHex != null && amiiboHex.size == 8) {
                 val amiibo = Amiibo(amiiboHex)
                 val tagId = nfcNtag?.amiiboFastRead(0, 1, i)
-//                Toast.makeText(this, "bank id $tagId", Toast.LENGTH_LONG).show()
                 if (tagId != null && tagId.size == 8) {
                     app.banks[i] = Bank(amiibo, tagId)
                 }
             }
         }
 
-    }
-
-
-
-    fun handleTag() {
-        nfcTag = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG)
-        nfcNtag = NfcNtag(nfcTag)
-
-        if (nfcNtag?.version == null) {
-            showErrorAndReturn("ERROR: Unsupported NFC tag found!")
-        }
-
-        // tagId()
-
-        try {
-            nfcNtag!!.connect()
-
-            when (app.currentAction as NFCAction) {
-                NFCAction.ACTION_ID -> TODO()
-                NFCAction.ACTION_WRITE -> TODO()
-                NFCAction.ACTION_EMPTY -> TODO()
-                NFCAction.ACTION_SETBANKCOUNT -> writeBankCount()
-                else -> TODO()
-            }
-        } catch (e: Exception) {
-            this.nfcTag = null
-        }
+        findViewById<TextView>(R.id.text_current_bank).text = getString(R.string.current_bank, currentBank, app.banks[currentBank].amiibo.name)
 
     }
 
-    fun tagId() {
-        app.resetAmiibos()
-
-        if (nfcNtag?.version == null) {
-            showErrorAndReturn("ERROR: Unsupported NFC tag found!")
-        }
-
-
-        val amiiboGetVersion = this.nfcNtag?.amiiboGetVersion()
-
-        if (amiiboGetVersion == null || amiiboGetVersion.size < 2) {
-            reconnectTag()
-//            enableNtagButtons() // -> mostra só os botoes de dump e unlock
-//            return 0 // -> tagId = 0 na ACTION_ID vai pra funcao readAmiibo()
-            return
-        }
-
-        currentBank = amiiboGetVersion[0]!!.toInt()
-        numBanks = amiiboGetVersion[1]!!.toInt()
-
-
-//        TextView textView = this.status;
-//        textView.setText(String.format(getAppName() + " found! (%d slots, #%d selected)", new Object[]{Integer.valueOf(this.numBanks & 255), Integer.valueOf((this.currentBank & 255) + 1)}));
-
-        if ((amiiboGetVersion.size != 4 || amiiboGetVersion[3].toInt() == 3)
-            && amiiboGetVersion.size != 2 && this.currentBank != 100 && this.numBanks != 0
-        ) {
-            val amiiboReadSig = nfcNtag?.amiiboReadSig()
-            if (amiiboReadSig != null) {
-                this.m_id = amiiboReadSig.toHex()
-            }
-
-            for (i in 0..numBanks) {
-                try {
-                    val amiiboFastRead = nfcNtag?.amiiboFastRead(21, 22, i)
-                    if (amiiboFastRead != null) {
-                        if (amiiboFastRead.size == 8) {
-                            val FromStatueId = Amiibo(amiiboFastRead!!)
-                            val amiiboFastRead2 = nfcNtag?.amiiboFastRead(0, 1, i)
-                            if (amiiboFastRead2 != null) {
-                                if (amiiboFastRead2.size == 8) {
-                                    app.banks[i] = Bank(FromStatueId, amiiboFastRead2)
-                                }
-                            }
-                            throw Exception();
-                        }
-                    }
-                    throw Exception();
-                } catch (e: Exception) {
-//                    this.status.setText("Failed to parse bank $i");
-                    this.app.banks[i] = Bank()
-                }
-
-            }
-
-//            this.logo.setImageResource(R.drawable.logo);
-//            enableAmiigoButtons();
-//            return 1;
-
-        }
-
-    }
-
-
-    private fun writeBankCount() {
-        try {
-            if (nfcNtag!!.amiiboSetBankcount(pickerValue) == null) {
-                showErrorAndReturn("ERROR: Failed to set bank count! Please try again.")
-                return
-            }
-            // TODO: success message
-//            this.status.setText(
-//                String.format(
-//                    "OK! Bank count updated! (%d)", *arrayOf<Any>(
-//                        Integer.valueOf(
-//                            pickerValue
-//                        )
-//                    )
-//                )
-//            )
-            numBanks = pickerValue
-        } catch (unused: IllegalStateException) {
-            showErrorAndReturn("Please try scanning again.")
-        }
-    }
 
 
     fun btnSetBanksNoClick(view: View?) {
@@ -232,13 +134,7 @@ class NFCActivity : AppCompatActivity() {
         numberPicker.value = numBanks and 255
         numberPicker.setOnValueChangedListener { np, i, i2 ->
             pickerValue = np.value
-            app.currentAction = NFCAction.ACTION_SETBANKCOUNT
-            // TODO: scan message
-//            val `access$200`: TextView = status
-//            `access$200`.text = String.format(
-//                "Please tap the tag to update the bank count!",
-//                *arrayOfNulls<Any>(0)
-//            )
+            app.currentAction = NFCAction.BANK_COUNT
         }
         val layoutParams = RelativeLayout.LayoutParams(50, 50)
         val layoutParams2 = RelativeLayout.LayoutParams(-2, -2)
@@ -253,12 +149,16 @@ class NFCActivity : AppCompatActivity() {
         ) { dialogInterface, i ->
             Log.e("", "New Quantity Value : " + numberPicker.value)
             pickerValue = numberPicker.value
-            app.currentAction = NFCAction.ACTION_SETBANKCOUNT
-//            val `access$200`: TextView = this@MainActivity.status
-//            `access$200`.text = String.format(
-//                "Please tap " + this@MainActivity.getAppName() + " to update bank count!",
-//                *arrayOfNulls<Any>(0)
-//            )
+            app.currentAction = NFCAction.BANK_COUNT
+            nfcPendingIntent = PendingIntent
+                .getActivity(
+                    this,
+                    87412,
+                    Intent(this, NFCActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP),
+                    PendingIntent.FLAG_UPDATE_CURRENT
+                )
+            writeTagFilters.add(IntentFilter(NfcAdapter.ACTION_TAG_DISCOVERED))
+            findViewById<TextView>(R.id.alert_tap).visibility = View.VISIBLE
         }.setNegativeButton(
             "Cancel"
         ) { dialogInterface, i -> dialogInterface.cancel() }
@@ -269,6 +169,8 @@ class NFCActivity : AppCompatActivity() {
 
     fun btnManageBanksClick(view: View?) = startActivity(Intent(this, GridActivity::class.java))
 
+    fun btnLockClick(view: View?) : Nothing = TODO()
+
 
     private fun reconnectTag() {
         try {
@@ -277,6 +179,11 @@ class NFCActivity : AppCompatActivity() {
         } catch (e: IOException) {
             e.printStackTrace()
         }
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        handleNFC(intent)
     }
 
     fun showErrorAndReturn(msg: String? = null) {

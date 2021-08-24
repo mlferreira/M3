@@ -8,15 +8,9 @@ class NFCApp : Application() {
     val banks: MutableList<Bank> = MutableList(MAX_BANKS) { Bank() }
     var bankCount = MAX_BANKS
     var currentBank = -1
-    var currentAction: NFCAction = NFCAction.ACTION_ID
+    var currentAction: NFCAction = NFCAction.NONE
 //    private val folderController: FolderController = null
     var lastPick = 0
-    var status: String? = null
-        set(value) {
-            updateStatus = true
-            field = value
-        }
-    var updateStatus = false
     var writeBank: Byte = 0
     var writeFile: String? = null
     var writeGuid: String? = null
