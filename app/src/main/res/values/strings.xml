@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">AA N2 Elite (Unofficial Patch)</string>
+    <string name="welcome_message">Welcome!</string>
+    <string name="enable_nfc_message">NFC must be enabled!</string>
+    <string name="scan_tag_message">Please, scan your tag to start.</string>
+    <string name="version">2.2.1 (unofficial patch)</string>
+</resources>

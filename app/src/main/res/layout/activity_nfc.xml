@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".NFCActivity"
+    >
+
+    <ImageView
+        android:id="@+id/n2logo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="28dip"
+        android:src="@drawable/n2logo" />
+
+    <TextView
+        android:id="@+id/teste_numbanks"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/n2logo"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="22dp"
+        android:text="Number of banks: ?"
+        android:textAlignment="center"
+        android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
+
+    <TextView
+        android:id="@+id/teste_curbank"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/teste_numbanks"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="22dp"
+        android:text="Current bank: ?"
+        android:textAlignment="center"
+        android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
+
+    <Button
+        android:id="@+id/button_set_bank_no"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Change Number of Banks"
+        android:textAlignment="center"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="88dip"
+        android:layout_below="@+id/n2logo"
+        android:onClick="btnSetBanksNoClick" />
+
+    <Button
+        android:id="@+id/button_manage_banks"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Manage Banks"
+        android:textAlignment="center"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="20dip"
+        android:layout_below="@+id/button_set_bank_no"
+        android:onClick="btnManageBanksClick"/>
+
+    <Button
+        android:id="@+id/button_lock"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Lock"
+        android:textAlignment="center"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="20dip"
+        android:layout_below="@+id/button_manage_banks"
+        android:onClick="btnSettingClick"/>
+
+    <Button
+        android:id="@+id/button_show_id"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Show ID"
+        android:textAlignment="center"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="20dip"
+        android:layout_below="@+id/button_lock"
+        android:onClick="btnSettingClick"/>
+
+    <Button
+        android:id="@+id/button_setting"
+        style="@style/Widget.AppCompat.Button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/version_footer"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="56dip"
+        android:onClick="btnSettingClick"
+        android:text="Settings"
+        android:visibility="visible" />
+
+    <TextView
+        android:id="@+id/version_footer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dip"
+        android:layout_alignParentBottom="true"
+        android:text="@string/version"
+        android:textAppearance="@style/TextAppearance.AppCompat.Small"
+        android:textColor="@color/gray_200"
+        android:layout_centerHorizontal="true" />
+
+</RelativeLayout>

@@ -1,0 +1,4 @@
+<resources>
+    <integer name="max_bank">255</integer>
+    <string name="dummy_hex">FFFFFFFFFFFFFFFF</string>
+</resources>
