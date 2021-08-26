@@ -4,7 +4,8 @@ import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.*
-import dev.mlferreira.n2eliteunofficial.Amiibo.Companion.DUMMY_ID
+import dev.mlferreira.n2eliteunofficial.entity.Amiibo.Companion.DUMMY
+import dev.mlferreira.n2eliteunofficial.util.ActionEnum
 
 
 class GridActivity : AppCompatActivity() {
@@ -36,13 +37,13 @@ class GridActivity : AppCompatActivity() {
     private fun activate(i: Int): Boolean {
         val nFCApp: NFCApp = application as NFCApp
 
-        if (nFCApp.banks[i].amiibo.characterIdHex != DUMMY_ID) {
+        if (nFCApp.banks[i].amiibo.characterIdHex != DUMMY) {
             nFCApp.writeBank = i.toByte()
 //            nFCApp.setStatus("Please tap and hold to activate bank!");
-            nFCApp.currentAction = NFCAction.ACTION_ACTIVATE
+            nFCApp.currentAction = ActionEnum.ACTION_ACTIVATE
 
 
-            setResult(-1, Intent(this, NFCActivity::class.java))
+            setResult(-1, Intent(this, MenuActivity::class.java))
 
             finish()
             return true
@@ -173,6 +174,5 @@ class GridActivity : AppCompatActivity() {
 //    }
 
 
-    fun ByteArray.toHex(): String = joinToString("") { "%02x".format(it) }
 
 }

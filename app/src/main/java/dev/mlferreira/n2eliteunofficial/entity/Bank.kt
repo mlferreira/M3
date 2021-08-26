@@ -1,4 +1,4 @@
-package dev.mlferreira.n2eliteunofficial
+package dev.mlferreira.n2eliteunofficial.entity
 
 class Bank(
     val amiibo: Amiibo = Amiibo(),

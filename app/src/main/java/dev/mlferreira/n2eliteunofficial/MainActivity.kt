@@ -9,6 +9,7 @@ import android.nfc.Tag
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.provider.Settings
+import android.util.Log
 import android.view.View
 import android.widget.TextView
 import android.widget.Toast
@@ -19,24 +20,24 @@ class MainActivity : AppCompatActivity() {
 
     private var nfcAdapter: NfcAdapter? = null
     private var nfcPendingIntent: PendingIntent? = null
-
-    private val writeTagFilters = mutableListOf<IntentFilter>()
+    private val intentFilters = mutableListOf<IntentFilter>()
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        println("MAIN ACTIVITY ON CREATE")
+        Log.d(this::class.simpleName, "[onCreate] started")
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        this.nfcAdapter = NfcAdapter.getDefaultAdapter(this)
+        nfcAdapter = NfcAdapter.getDefaultAdapter(this)
 
+        // if phone has no NFC
         if (nfcAdapter == null) {
-            // if phone has no NFC
             Toast
                 .makeText(this, "Sorry, your device does not support NFC! :(", Toast.LENGTH_LONG)
                 .show()
             finish()
         } else if (nfcAdapter?.isEnabled == false) {
+            // if NFC is disabled, show message to enable it
             findViewById<TextView>(R.id.enable_nfc).visibility = View.VISIBLE
         }
 
@@ -48,16 +49,17 @@ class MainActivity : AppCompatActivity() {
             .getActivity(
                 this,
                 14759,
-                Intent(this, NFCActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP),
-                FLAG_ONE_SHOT
+                Intent(this, MenuActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP),
+                PendingIntent.FLAG_ONE_SHOT
             )
-        writeTagFilters.add(IntentFilter(NfcAdapter.ACTION_TAG_DISCOVERED))
+        intentFilters.add(IntentFilter(NfcAdapter.ACTION_TAG_DISCOVERED))
 
     }
 
     override fun onResume() {
+        Log.d(this::class.simpleName, "[onResume] started")
         super.onResume()
-        nfcAdapter?.enableForegroundDispatch(this, nfcPendingIntent, writeTagFilters.toTypedArray(), null)
+        nfcAdapter?.enableForegroundDispatch(this, nfcPendingIntent, intentFilters.toTypedArray(), null)
 
         if (nfcAdapter?.isEnabled == false) {
             findViewById<TextView>(R.id.enable_nfc).visibility = View.VISIBLE
@@ -67,16 +69,19 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onNewIntent(intent: Intent) {
+        Log.d(this::class.simpleName, "[onNewIntent] started")
         super.onNewIntent(intent)
         processNfcTag(intent)
     }
 
     override fun onPause() {
+        Log.d(this::class.simpleName, "[onPause] started")
         super.onPause()
         nfcAdapter?.disableForegroundDispatch(this)
     }
 
     private fun processNfcTag(intent: Intent) {
+        Log.d(this::class.simpleName, "[processNfcTag] started")
         val nfcTag: Tag? = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG)
 
         if (nfcTag != null) {

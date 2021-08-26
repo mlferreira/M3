@@ -43,11 +43,16 @@ public class NfcNtag implements TagTechnology {
     }
 
     public void connect() throws IOException {
+        if (nfca.isConnected()) {
+            close();
+        }
         nfca.connect();
     }
 
     public void close() throws IOException {
-        nfca.close();
+        if (nfca.isConnected()) {
+            nfca.close();
+        }
     }
 
     public int getMaxTransceiveLength() {
@@ -429,7 +434,7 @@ public class NfcNtag implements TagTechnology {
         byte[] req = new byte[2];
         byte[] resp;
 
-        req[0] = NfcNtagOpcode.AMIIBO_READ_SIG;
+        req[0] = NfcNtagOpcode.AMIIBO_SET_BANKCOUNT;
         req[1] = (byte)(i & 0xFF);
 
         try {

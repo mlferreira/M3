@@ -1,6 +1,6 @@
-package dev.mlferreira.n2eliteunofficial
+package dev.mlferreira.n2eliteunofficial.util
 
-enum class NFCAction {
+enum class ActionEnum {
     NONE,
     BANK_COUNT,
     LOCK,

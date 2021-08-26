@@ -16,8 +16,8 @@ import com.android.volley.Response
 import com.android.volley.toolbox.ImageRequest
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
-import com.google.gson.JsonObject
-import com.google.gson.JsonParser
+import dev.mlferreira.n2eliteunofficial.entity.Amiibo
+import dev.mlferreira.n2eliteunofficial.entity.Bank
 import java.lang.Exception
 
 
@@ -63,7 +63,7 @@ class ImageAdapter(
         try {
             val amiibo: Amiibo = allBanks[position].amiibo
 
-            if (amiibo.hexId.equals(Amiibo.DUMMY_ID, ignoreCase = true)) {
+            if (amiibo.hexId.equals(Amiibo.DUMMY, ignoreCase = true)) {
                 viewHolder.text.text = "EMPTY"
             } else {
                 viewHolder.text.text = "Loading..."

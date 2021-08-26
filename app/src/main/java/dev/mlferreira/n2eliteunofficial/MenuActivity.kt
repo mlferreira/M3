@@ -16,18 +16,24 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.recyclerview.widget.ItemTouchHelper
 import com.smartrac.nfc.NfcNtag
+import dev.mlferreira.n2eliteunofficial.entity.Amiibo
+import dev.mlferreira.n2eliteunofficial.entity.Bank
+import dev.mlferreira.n2eliteunofficial.util.ActionEnum
+import dev.mlferreira.n2eliteunofficial.util.toHex
+import dev.mlferreira.n2eliteunofficial.util.toHexBigInt
 import java.io.IOException
 import java.lang.IllegalStateException
 
 
-class NFCActivity : AppCompatActivity() {
+class MenuActivity : AppCompatActivity() {
 
     private lateinit var app: NFCApp
     var nfcNtag: NfcNtag? = null
     private var nfcTag: Tag? = null
 
+    private var nfcAdapter: NfcAdapter? = null
     private var nfcPendingIntent: PendingIntent? = null
-    private val writeTagFilters = mutableListOf<IntentFilter>()
+    private val intentFilters = mutableListOf<IntentFilter>()
 
 
     private var currentBank: Int = -1
@@ -47,10 +53,15 @@ class NFCActivity : AppCompatActivity() {
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        Log.d(this::class.simpleName, "[onCreate] started")
+
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_nfc)
 
+        findViewById<TextView>(R.id.alert_tap).visibility = View.GONE
+
         app = application as NFCApp
+        nfcAdapter = NfcAdapter.getDefaultAdapter(this)
 
         nfcTag = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG)
 
@@ -58,35 +69,21 @@ class NFCActivity : AppCompatActivity() {
             Toast.makeText(this, "nfcTag is null", Toast.LENGTH_LONG).show()
         }
 
-        handleNFC()
-
-    }
-
-    fun handleNFC(intent: Intent? = null) {
-        when(app.currentAction) {
-            NFCAction.BANK_COUNT -> {
-                Toast.makeText(this, "set bank count", Toast.LENGTH_LONG).show()
-                try {
-                    if (nfcNtag!!.amiiboSetBankcount(pickerValue) == null) {
-                        showErrorAndReturn("ERROR: Failed to set bank count! Please try again.")
-                        return
-                    }
-                    app.currentAction = NFCAction.NONE
-                    findViewById<TextView>(R.id.alert_tap).visibility = View.GONE
-                } catch (unused: IllegalStateException) {
-//                    showErrorAndReturn("Please try scanning again.")
-                }
-            }
-            else -> {}
-        }
         getTagInfo()
     }
 
+
+
     fun getTagInfo() {
+        Log.d(this::class.simpleName, "[getTagInfo] started")
+        nfcNtag?.close()
+
         nfcTag = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG)
         nfcNtag = NfcNtag.get(nfcTag)
 
-        nfcNtag?.connect()
+        if (nfcNtag?.isConnected == false) {
+            nfcNtag?.connect()
+        }
 
         if (nfcNtag?.version == null) {
             reconnectTag()
@@ -127,6 +124,7 @@ class NFCActivity : AppCompatActivity() {
 
 
     fun btnSetBanksNoClick(view: View?) {
+        Log.d(this::class.simpleName, "[btnSetBanksNoClick] started")
         val relativeLayout = RelativeLayout(applicationContext)
         val numberPicker = NumberPicker(this)
         numberPicker.maxValue = ItemTouchHelper.Callback.DEFAULT_DRAG_ANIMATION_DURATION
@@ -134,7 +132,7 @@ class NFCActivity : AppCompatActivity() {
         numberPicker.value = numBanks and 255
         numberPicker.setOnValueChangedListener { np, i, i2 ->
             pickerValue = np.value
-            app.currentAction = NFCAction.BANK_COUNT
+            app.currentAction = ActionEnum.BANK_COUNT
         }
         val layoutParams = RelativeLayout.LayoutParams(50, 50)
         val layoutParams2 = RelativeLayout.LayoutParams(-2, -2)
@@ -149,16 +147,21 @@ class NFCActivity : AppCompatActivity() {
         ) { dialogInterface, i ->
             Log.e("", "New Quantity Value : " + numberPicker.value)
             pickerValue = numberPicker.value
-            app.currentAction = NFCAction.BANK_COUNT
-            nfcPendingIntent = PendingIntent
-                .getActivity(
-                    this,
-                    87412,
-                    Intent(this, NFCActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP),
-                    PendingIntent.FLAG_UPDATE_CURRENT
-                )
-            writeTagFilters.add(IntentFilter(NfcAdapter.ACTION_TAG_DISCOVERED))
-            findViewById<TextView>(R.id.alert_tap).visibility = View.VISIBLE
+            app.pickerValue = numberPicker.value
+            app.currentAction = ActionEnum.BANK_COUNT
+//            nfcPendingIntent = PendingIntent
+//                .getActivity(
+//                    this,
+//                    87412,
+//                    Intent(this, NFCTapActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP),
+//                    0
+//                )
+//            intentFilters.add(IntentFilter(NfcAdapter.ACTION_TAG_DISCOVERED))
+//            findViewById<TextView>(R.id.alert_tap).visibility = View.VISIBLE
+//            nfcAdapter?.enableForegroundDispatch(this, nfcPendingIntent, intentFilters.toTypedArray(), null)
+            val menuIntent = Intent(this, NFCTapActivity::class.java)
+                .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+            startActivity(menuIntent)
         }.setNegativeButton(
             "Cancel"
         ) { dialogInterface, i -> dialogInterface.cancel() }
@@ -173,6 +176,7 @@ class NFCActivity : AppCompatActivity() {
 
 
     private fun reconnectTag() {
+        Log.d(this::class.simpleName, "[reconnectTag] started")
         try {
             nfcNtag!!.close()
             nfcNtag!!.connect()
@@ -181,18 +185,73 @@ class NFCActivity : AppCompatActivity() {
         }
     }
 
-    override fun onNewIntent(intent: Intent) {
-        super.onNewIntent(intent)
-        handleNFC(intent)
+    override fun onResume() {
+        Log.d(this::class.simpleName, "[onResume] started")
+        super.onResume()
+        if (nfcPendingIntent != null) {
+            nfcAdapter?.enableForegroundDispatch(
+                this,
+                nfcPendingIntent,
+                intentFilters.toTypedArray(),
+                null
+            )
+        }
     }
 
-    fun showErrorAndReturn(msg: String? = null) {
+    override fun onNewIntent(intent: Intent) {
+        Log.d(this::class.simpleName, "[onNewIntent] started")
+        super.onNewIntent(intent)
+
+        nfcPendingIntent = null
+        setIntent(intent)
+
+        nfcNtag?.close()
+
+        nfcTag = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG)
+        nfcNtag = NfcNtag.get(nfcTag)
+
+        if (!nfcNtag!!.isConnected) {
+            nfcNtag!!.connect()
+        }
+
+        when(app.currentAction) {
+            ActionEnum.BANK_COUNT -> {
+                Log.d(this::class.simpleName, "[onNewIntent] changing bank count to ${app.pickerValue}")
+                try {
+                    val response = nfcNtag!!.amiiboSetBankcount(app.pickerValue)
+                    if (response == null) {
+                        Log.d(this::class.simpleName, "[onNewIntent] setting bank count returned null")
+                        showErrorAndReturn("ERROR: Failed to set bank count! Please try again.")
+                        return
+                    }
+                    Log.d(this::class.simpleName, "[onNewIntent] response = ${response.toHex()}")
+                    app.currentAction = ActionEnum.NONE
+                    findViewById<TextView>(R.id.alert_tap).visibility = View.GONE
+                } catch (unused: IllegalStateException) {
+                    Log.d(this::class.simpleName, "[onNewIntent] setting bank threw error")
+                    showErrorAndReturn("Please try scanning again.")
+                }
+            }
+            else -> {
+                Log.w(this::class.simpleName, "[onNewIntent] action not mapped - ${app.currentAction}")
+            }
+        }
+
+        findViewById<TextView>(R.id.alert_tap).visibility = View.GONE
+
+        getTagInfo()
+    }
+
+    override fun onPause() {
+        Log.d(this::class.simpleName, "[onPause] started")
+        super.onPause()
+        nfcAdapter?.disableForegroundDispatch(this)
+    }
+
+    private fun showErrorAndReturn(msg: String? = null) {
+        Log.d(this::class.simpleName, "[showErrorAndReturn] started")
         Toast.makeText(this, (msg ?: "ERROR!"), Toast.LENGTH_LONG).show()
         this.finish()
     }
-
-
-
-    fun ByteArray.toHex(): String = joinToString("") { "%02x".format(it) }
 
 }
