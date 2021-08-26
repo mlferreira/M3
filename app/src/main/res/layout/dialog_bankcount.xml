@@ -3,27 +3,18 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/layout_picker_bank_count"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:layout_centerHorizontal="true"
     android:layout_centerVertical="true"
     tools:context=".MenuActivity">
 
-    <TextView
-        android:id="@+id/text_select_bank_count"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="16dip"
-        android:text="Select the number of banks to activate:" />
-
     <NumberPicker
         android:id="@+id/picker_bank_count"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/text_select_bank_count"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="88dip" />
+        tools:context=".MenuActivity"/>
 
 </RelativeLayout>

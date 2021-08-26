@@ -68,30 +68,10 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    override fun onNewIntent(intent: Intent) {
-        Log.d(this::class.simpleName, "[onNewIntent] started")
-        super.onNewIntent(intent)
-        processNfcTag(intent)
-    }
-
     override fun onPause() {
         Log.d(this::class.simpleName, "[onPause] started")
         super.onPause()
         nfcAdapter?.disableForegroundDispatch(this)
-    }
-
-    private fun processNfcTag(intent: Intent) {
-        Log.d(this::class.simpleName, "[processNfcTag] started")
-        val nfcTag: Tag? = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG)
-
-        if (nfcTag != null) {
-            val nfcNtag: NfcNtag = NfcNtag(nfcTag)
-            intent.putExtra("tag", nfcTag)
-
-            startActivity(intent)
-
-        }
-
     }
 
 

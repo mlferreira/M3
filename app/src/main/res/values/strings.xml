@@ -5,7 +5,7 @@
     <string name="scan_tag_message">Please, scan your tag to start.</string>
     <string name="version">2.2.1 (unofficial patch)</string>
     <string name="tag_id">Tag: %1$s</string>
-    <string name="current_bank">Active: #%1$d (%2$s)</string>
+    <string name="current_bank">Active: #%1$d</string>
     <string name="bank_count"># banks: %1$d</string>
     <string name="tap_and_hold">Tap and hold your tag to save changes</string>
 </resources>

@@ -1,9 +1,7 @@
 package dev.mlferreira.n2eliteunofficial
 
 import android.app.AlertDialog
-import android.app.PendingIntent
 import android.content.Intent
-import android.content.IntentFilter
 import android.nfc.NfcAdapter
 import android.nfc.Tag
 import androidx.appcompat.app.AppCompatActivity
@@ -20,21 +18,15 @@ import dev.mlferreira.n2eliteunofficial.entity.Amiibo
 import dev.mlferreira.n2eliteunofficial.entity.Bank
 import dev.mlferreira.n2eliteunofficial.util.ActionEnum
 import dev.mlferreira.n2eliteunofficial.util.toHex
-import dev.mlferreira.n2eliteunofficial.util.toHexBigInt
-import java.io.IOException
-import java.lang.IllegalStateException
 
 
 class MenuActivity : AppCompatActivity() {
 
     private lateinit var app: NFCApp
+    private lateinit var confirmation: Intent
+
     var nfcNtag: NfcNtag? = null
     private var nfcTag: Tag? = null
-
-    private var nfcAdapter: NfcAdapter? = null
-    private var nfcPendingIntent: PendingIntent? = null
-    private val intentFilters = mutableListOf<IntentFilter>()
-
 
     private var currentBank: Int = -1
         set (value) {
@@ -46,10 +38,6 @@ class MenuActivity : AppCompatActivity() {
             field = (value and 255)
             app.bankCount = (value and 255)
         }
-    private var pickerValue: Int = 0
-    private var m_id: String? = null
-
-    val numberPicker = 0
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -58,16 +46,8 @@ class MenuActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_nfc)
 
-        findViewById<TextView>(R.id.alert_tap).visibility = View.GONE
-
         app = application as NFCApp
-        nfcAdapter = NfcAdapter.getDefaultAdapter(this)
-
-        nfcTag = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG)
-
-        if (nfcTag == null) {
-            Toast.makeText(this, "nfcTag is null", Toast.LENGTH_LONG).show()
-        }
+        confirmation = Intent(this, NFCTapActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
 
         getTagInfo()
     }
@@ -76,18 +56,8 @@ class MenuActivity : AppCompatActivity() {
 
     fun getTagInfo() {
         Log.d(this::class.simpleName, "[getTagInfo] started")
-        nfcNtag?.close()
 
-        nfcTag = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG)
-        nfcNtag = NfcNtag.get(nfcTag)
-
-        if (nfcNtag?.isConnected == false) {
-            nfcNtag?.connect()
-        }
-
-        if (nfcNtag?.version == null) {
-            reconnectTag()
-        }
+        getNFCTag()
 
         val info = this.nfcNtag!!.amiiboGetVersion()
 
@@ -103,7 +73,7 @@ class MenuActivity : AppCompatActivity() {
 
         findViewById<TextView>(R.id.text_tag_id).text = getString(R.string.tag_id, tagID)
         findViewById<TextView>(R.id.text_bank_count).text = getString(R.string.bank_count, numBanks)
-        findViewById<TextView>(R.id.text_current_bank).text = getString(R.string.current_bank, currentBank, "?")
+        findViewById<TextView>(R.id.text_current_bank).text = getString(R.string.current_bank, currentBank + 1)
 
 
         for (i in 0..numBanks) {
@@ -117,21 +87,20 @@ class MenuActivity : AppCompatActivity() {
             }
         }
 
-        findViewById<TextView>(R.id.text_current_bank).text = getString(R.string.current_bank, currentBank, app.banks[currentBank].amiibo.name)
-
     }
-
 
 
     fun btnSetBanksNoClick(view: View?) {
         Log.d(this::class.simpleName, "[btnSetBanksNoClick] started")
+//        val relativeLayout = findViewById<RelativeLayout>(R.id.layout_picker_bank_count)
         val relativeLayout = RelativeLayout(applicationContext)
+//        val numberPicker = findViewById<NumberPicker>(R.id.picker_bank_count)
         val numberPicker = NumberPicker(this)
         numberPicker.maxValue = ItemTouchHelper.Callback.DEFAULT_DRAG_ANIMATION_DURATION
         numberPicker.minValue = 1
         numberPicker.value = numBanks and 255
         numberPicker.setOnValueChangedListener { np, i, i2 ->
-            pickerValue = np.value
+            app.pickerValue = np.value
             app.currentAction = ActionEnum.BANK_COUNT
         }
         val layoutParams = RelativeLayout.LayoutParams(50, 50)
@@ -140,31 +109,14 @@ class MenuActivity : AppCompatActivity() {
         relativeLayout.layoutParams = layoutParams
         relativeLayout.addView(numberPicker, layoutParams2)
         val builder = AlertDialog.Builder(this)
-        builder.setTitle("Select number of banks")
-        builder.setView(relativeLayout)
-        builder.setCancelable(false).setPositiveButton(
-            "Ok"
-        ) { dialogInterface, i ->
-            Log.e("", "New Quantity Value : " + numberPicker.value)
-            pickerValue = numberPicker.value
-            app.pickerValue = numberPicker.value
-            app.currentAction = ActionEnum.BANK_COUNT
-//            nfcPendingIntent = PendingIntent
-//                .getActivity(
-//                    this,
-//                    87412,
-//                    Intent(this, NFCTapActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP),
-//                    0
-//                )
-//            intentFilters.add(IntentFilter(NfcAdapter.ACTION_TAG_DISCOVERED))
-//            findViewById<TextView>(R.id.alert_tap).visibility = View.VISIBLE
-//            nfcAdapter?.enableForegroundDispatch(this, nfcPendingIntent, intentFilters.toTypedArray(), null)
-            val menuIntent = Intent(this, NFCTapActivity::class.java)
-                .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-            startActivity(menuIntent)
-        }.setNegativeButton(
-            "Cancel"
-        ) { dialogInterface, i -> dialogInterface.cancel() }
+            .setTitle("Select number of banks")
+            .setView(relativeLayout)
+            .setCancelable(false).setPositiveButton("Ok") { dialogInterface, i ->
+                app.pickerValue = numberPicker.value
+                app.currentAction = ActionEnum.BANK_COUNT
+                startActivity(confirmation)
+            }
+            .setNegativeButton("Cancel") { dialogInterface, i -> dialogInterface.cancel() }
         builder.create().show()
     }
 
@@ -177,81 +129,18 @@ class MenuActivity : AppCompatActivity() {
 
     private fun reconnectTag() {
         Log.d(this::class.simpleName, "[reconnectTag] started")
-        try {
-            nfcNtag!!.close()
-            nfcNtag!!.connect()
-        } catch (e: IOException) {
-            e.printStackTrace()
+        if (nfcNtag?.isConnected == true) {
+            nfcNtag?.close()
         }
+        nfcNtag?.connect()
     }
 
-    override fun onResume() {
-        Log.d(this::class.simpleName, "[onResume] started")
-        super.onResume()
-        if (nfcPendingIntent != null) {
-            nfcAdapter?.enableForegroundDispatch(
-                this,
-                nfcPendingIntent,
-                intentFilters.toTypedArray(),
-                null
-            )
-        }
-    }
-
-    override fun onNewIntent(intent: Intent) {
-        Log.d(this::class.simpleName, "[onNewIntent] started")
-        super.onNewIntent(intent)
-
-        nfcPendingIntent = null
-        setIntent(intent)
-
+    private fun getNFCTag() {
         nfcNtag?.close()
 
         nfcTag = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG)
         nfcNtag = NfcNtag.get(nfcTag)
 
-        if (!nfcNtag!!.isConnected) {
-            nfcNtag!!.connect()
-        }
-
-        when(app.currentAction) {
-            ActionEnum.BANK_COUNT -> {
-                Log.d(this::class.simpleName, "[onNewIntent] changing bank count to ${app.pickerValue}")
-                try {
-                    val response = nfcNtag!!.amiiboSetBankcount(app.pickerValue)
-                    if (response == null) {
-                        Log.d(this::class.simpleName, "[onNewIntent] setting bank count returned null")
-                        showErrorAndReturn("ERROR: Failed to set bank count! Please try again.")
-                        return
-                    }
-                    Log.d(this::class.simpleName, "[onNewIntent] response = ${response.toHex()}")
-                    app.currentAction = ActionEnum.NONE
-                    findViewById<TextView>(R.id.alert_tap).visibility = View.GONE
-                } catch (unused: IllegalStateException) {
-                    Log.d(this::class.simpleName, "[onNewIntent] setting bank threw error")
-                    showErrorAndReturn("Please try scanning again.")
-                }
-            }
-            else -> {
-                Log.w(this::class.simpleName, "[onNewIntent] action not mapped - ${app.currentAction}")
-            }
-        }
-
-        findViewById<TextView>(R.id.alert_tap).visibility = View.GONE
-
-        getTagInfo()
+        reconnectTag()
     }
-
-    override fun onPause() {
-        Log.d(this::class.simpleName, "[onPause] started")
-        super.onPause()
-        nfcAdapter?.disableForegroundDispatch(this)
-    }
-
-    private fun showErrorAndReturn(msg: String? = null) {
-        Log.d(this::class.simpleName, "[showErrorAndReturn] started")
-        Toast.makeText(this, (msg ?: "ERROR!"), Toast.LENGTH_LONG).show()
-        this.finish()
-    }
-
 }

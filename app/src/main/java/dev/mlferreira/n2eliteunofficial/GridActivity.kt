@@ -3,6 +3,7 @@ package dev.mlferreira.n2eliteunofficial
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.widget.*
 import dev.mlferreira.n2eliteunofficial.entity.Amiibo.Companion.DUMMY
 import dev.mlferreira.n2eliteunofficial.util.ActionEnum
@@ -10,22 +11,25 @@ import dev.mlferreira.n2eliteunofficial.util.ActionEnum
 
 class GridActivity : AppCompatActivity() {
 
-    var app: NFCApp? = null
+    private lateinit var app: NFCApp
+    private lateinit var confirmation: Intent
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        Log.d(this::class.simpleName, "[onCreate] started")
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_grid)
 
         app = application as NFCApp
+        confirmation = Intent(this, NFCTapActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
 
         val gridView: GridView = findViewById(R.id.gridview)
 
         gridView.adapter = ImageAdapter(
             this,
-            app!!.currentBank,
-            app!!.bankCount,
-            app!!.banks
+            app.currentBank,
+            app.bankCount,
+            app.banks
         ) as ListAdapter
 
         gridView.onItemClickListener = AdapterView
@@ -35,21 +39,16 @@ class GridActivity : AppCompatActivity() {
     }
 
     private fun activate(i: Int): Boolean {
-        val nFCApp: NFCApp = application as NFCApp
+        Log.d(this::class.simpleName, "[activate] started")
 
-        if (nFCApp.banks[i].amiibo.characterIdHex != DUMMY) {
-            nFCApp.writeBank = i.toByte()
-//            nFCApp.setStatus("Please tap and hold to activate bank!");
-            nFCApp.currentAction = ActionEnum.ACTION_ACTIVATE
+        if (app.banks[i].amiibo.characterIdHex != DUMMY) {
+            Log.d(this::class.simpleName, "[activate] will activate #$i")
+            app.writeBank = i
+            app.currentAction = ActionEnum.ACTION_ACTIVATE
 
-
-            setResult(-1, Intent(this, MenuActivity::class.java))
-
-            finish()
-            return true
+            startActivity(confirmation)
         }
 
-//        restore(i)
         return false
     }
 

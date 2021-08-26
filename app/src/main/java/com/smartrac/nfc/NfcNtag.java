@@ -444,4 +444,19 @@ public class NfcNtag implements TagTechnology {
         }
         return resp;
     }
+
+    public byte[] amiiboActivateBank(int i) {
+        byte[] req = new byte[2];
+        byte[] resp;
+
+        req[0] = NfcNtagOpcode.AMIIBO_ACTIVATE_BANK;
+        req[1] = (byte)(i & 0xFF);
+
+        try {
+            resp = nfca.transceive(req);
+        } catch (IOException ex) {
+            resp = null;
+        }
+        return resp;
+    }
 }

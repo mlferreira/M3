@@ -14,7 +14,8 @@ class NFCApp : Application() {
     var pickerValue = 0
 //    private val folderController: FolderController = null
     var lastPick = 0
-    var writeBank: Byte = 0
+    var writeBank: Int = -1
+
     var writeFile: String? = null
     var writeGuid: String? = null
 

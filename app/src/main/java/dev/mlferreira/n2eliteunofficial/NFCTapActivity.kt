@@ -56,14 +56,16 @@ class NFCTapActivity : AppCompatActivity() {
 
         super.onNewIntent(intent)
 
-        handleNFC(intent)
 
-        if (nfcTag != null) {
-            val menuIntent = Intent(this, MenuActivity::class.java)
-                .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-                .putExtra("tag", nfcTag)
-            startActivity(menuIntent)
-        }
+
+        val menuIntent = handleNFC(intent)
+            .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+            .putExtra("tag", nfcTag)
+
+        app.currentAction = ActionEnum.NONE
+
+
+        startActivity(menuIntent)
     }
 
     override fun onPause() {
@@ -72,7 +74,7 @@ class NFCTapActivity : AppCompatActivity() {
         nfcAdapter?.disableForegroundDispatch(this)
     }
 
-    private fun handleNFC(nIntent: Intent) {
+    private fun handleNFC(nIntent: Intent): Intent {
         Log.d(this::class.simpleName, "[handleNFC] started")
 
         nfcTag = nIntent.getParcelableExtra(NfcAdapter.EXTRA_TAG)
@@ -82,30 +84,36 @@ class NFCTapActivity : AppCompatActivity() {
             nfcNtag!!.connect()
         }
 
-        when(app.currentAction) {
+        return when(app.currentAction) {
             ActionEnum.BANK_COUNT -> {
-                Log.d(this::class.simpleName, "[handleNFC] changing bank count")
-                try {
-                    if (nfcNtag!!.amiiboSetBankcount(app.pickerValue) == null) {
-                        Log.d(this::class.simpleName, "[handleNFC] setting bank count returned null")
-                        showErrorAndReturn("ERROR: Failed to set bank count! Please try again.")
-                        return
-                    }
-                    app.currentAction = ActionEnum.NONE
-                    findViewById<TextView>(R.id.alert_tap).visibility = View.GONE
-                } catch (unused: IllegalStateException) {
-                    Log.d(this::class.simpleName, "[handleNFC] setting bank threw error")
-                    showErrorAndReturn("Please try scanning again.")
+                Log.d(this::class.simpleName, "[handleNFC] changing bank count to ${app.pickerValue}")
+                if (nfcNtag!!.amiiboSetBankcount(app.pickerValue) == null) {
+                    Log.e(this::class.simpleName, "[handleNFC] setting bank count returned null")
+                    showErrorAndReturn("ERROR: Failed to set bank count! Please try again.")
+                } else {
+                    app.bankCount = app.pickerValue
                 }
+                return Intent(this, MenuActivity::class.java)
+            }
+            ActionEnum.ACTION_ACTIVATE -> {
+                Log.d(this::class.simpleName, "[handleNFC] changing bank count to ${app.writeBank}")
+                if (nfcNtag!!.amiiboActivateBank(app.writeBank) == null) {
+                    Log.e(this::class.simpleName, "[handleNFC] activating bank count returned null")
+                    showErrorAndReturn("ERROR: Failed to set bank count! Please try again.")
+                } else {
+                    app.currentBank = app.writeBank
+                }
+                return Intent(this, GridActivity::class.java)
             }
             else -> {
                 Log.w(this::class.simpleName, "[handleNFC] action not mapped - ${app.currentAction}")
+                Intent(this, MenuActivity::class.java)
             }
         }
     }
 
     private fun showErrorAndReturn(msg: String? = null) {
-        Log.d(this::class.simpleName, "[showErrorAndReturn] started")
+        Log.e(this::class.simpleName, "[showErrorAndReturn] $msg")
         Toast.makeText(this, (msg ?: "ERROR!"), Toast.LENGTH_LONG).show()
         this.finish()
     }
