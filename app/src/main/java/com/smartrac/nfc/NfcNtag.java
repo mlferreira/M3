@@ -416,6 +416,33 @@ public class NfcNtag implements TagTechnology {
         return resp;
     }
 
+    public boolean amiiboFastWrite(int addr, int bank, byte[] data) {
+        return amiiboWrite(addr, bank, data);
+    }
+    public boolean amiiboWrite(int addr, int bank, byte[] data) {
+
+        if (data == null) {
+            return false;
+        }
+        if (data.length != 4) {
+            return false;
+        }
+
+        byte[] req = new byte[data.length + 4];
+        req[0] = NfcNtagOpcode.AMIIBO_WRITE;
+        req[1] = (byte)(addr & 0xFF);
+        req[2] = (byte)(bank & 0xFF);
+        req[3] = (byte)(data.length & 0xFF);
+
+        try {
+            System.arraycopy(data, 0, req, 4, data.length);
+            nfca.transceive(req);
+        } catch (IOException ex) {
+            return false;
+        }
+        return true;
+    }
+
     public byte[] amiiboReadSig() {
         byte[] req = new byte[1];
         byte[] resp;

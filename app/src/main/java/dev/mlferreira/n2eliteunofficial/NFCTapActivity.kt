@@ -56,8 +56,6 @@ class NFCTapActivity : AppCompatActivity() {
 
         super.onNewIntent(intent)
 
-
-
         val menuIntent = handleNFC(intent)
             .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
             .putExtra("tag", nfcTag)
@@ -95,7 +93,7 @@ class NFCTapActivity : AppCompatActivity() {
                 }
                 return Intent(this, MenuActivity::class.java)
             }
-            ActionEnum.ACTION_ACTIVATE -> {
+            ActionEnum.ACTIVATE -> {
                 Log.d(this::class.simpleName, "[handleNFC] changing bank count to ${app.writeBank}")
                 if (nfcNtag!!.amiiboActivateBank(app.writeBank) == null) {
                     Log.e(this::class.simpleName, "[handleNFC] activating bank count returned null")
@@ -105,11 +103,47 @@ class NFCTapActivity : AppCompatActivity() {
                 }
                 return Intent(this, GridActivity::class.java)
             }
+            ActionEnum.WRITE -> {
+                Log.d(this::class.simpleName, "[handleNFC] writing to bank ${app.writeBank}")
+                val data = app.folderController.readBlobFromFile(app.writeFile!!)
+                if (!write(data)) {
+                    Log.e(this::class.simpleName, "[handleNFC] writing amiibo returned false")
+                    showErrorAndReturn("ERROR: Failed to set bank count! Please try again.")
+                }
+                return Intent(this, GridActivity::class.java)
+            }
             else -> {
                 Log.w(this::class.simpleName, "[handleNFC] action not mapped - ${app.currentAction}")
                 Intent(this, MenuActivity::class.java)
             }
         }
+    }
+
+    private fun write(data: ByteArray?): Boolean {
+        if (data == null) {
+            showErrorAndReturn("The file is null.")
+            return false
+        }
+
+
+        if (data.size < 540) {
+            showErrorAndReturn("The file seems to be invalid. It must have at least 540 bytes.")
+            return false
+        }
+
+        val bArr = ByteArray(540)
+        System.arraycopy(data, 0, bArr, 0, 540)
+
+        // TODO: check tagAuth()?
+
+        // TODO: check fast write?
+
+        if (nfcNtag!!.amiiboWrite(0, app.writeBank, bArr)) {
+            showErrorAndReturn("Could not write amiibo to bank #" + (app.writeBank and 255) + 1)
+            return false
+        }
+
+        return true
     }
 
     private fun showErrorAndReturn(msg: String? = null) {

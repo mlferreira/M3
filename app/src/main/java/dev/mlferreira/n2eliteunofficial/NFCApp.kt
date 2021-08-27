@@ -12,7 +12,7 @@ class NFCApp : Application() {
     var currentBank = -1
     var currentAction: ActionEnum = ActionEnum.NONE
     var pickerValue = 0
-//    private val folderController: FolderController = null
+    lateinit var folderController: FolderController
     var lastPick = 0
     var writeBank: Int = -1
 
@@ -23,6 +23,7 @@ class NFCApp : Application() {
     override fun onCreate() {
         super.onCreate()
         resetAmiibos()
+        folderController = FolderController(this)
     }
 
     fun resetAmiibos() = banks.replaceAll { Bank() }

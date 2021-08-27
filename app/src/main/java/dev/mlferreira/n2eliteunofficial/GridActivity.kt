@@ -5,8 +5,13 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.widget.*
+import com.github.angads25.filepicker.controller.DialogSelectionListener
+import com.github.angads25.filepicker.model.DialogConfigs
+import com.github.angads25.filepicker.model.DialogProperties
+import com.github.angads25.filepicker.view.FilePickerDialog
 import dev.mlferreira.n2eliteunofficial.entity.Amiibo.Companion.DUMMY
 import dev.mlferreira.n2eliteunofficial.util.ActionEnum
+import java.io.File
 
 
 class GridActivity : AppCompatActivity() {
@@ -33,23 +38,27 @@ class GridActivity : AppCompatActivity() {
         ) as ListAdapter
 
         gridView.onItemClickListener = AdapterView
-            .OnItemClickListener { adapterView, view, i, j ->  this.activate(i) }
+            .OnItemClickListener { adapterView, view, i, j ->  this.select(i) }
 
         registerForContextMenu(gridView)
     }
 
-    private fun activate(i: Int): Boolean {
+    private fun select(i: Int) {
         Log.d(this::class.simpleName, "[activate] started")
 
-        if (app.banks[i].amiibo.characterIdHex != DUMMY) {
-            Log.d(this::class.simpleName, "[activate] will activate #$i")
-            app.writeBank = i
-            app.currentAction = ActionEnum.ACTION_ACTIVATE
+        app.writeBank = i
 
-            startActivity(confirmation)
+        // empty bank - add new amiibo
+        if (app.banks[i].amiibo.characterIdHex == DUMMY) {
+            Log.d(this::class.simpleName, "[activate] bank #$i is empty - skip to add new")
+            write()
         }
 
-        return false
+        // set bank as active
+        Log.d(this::class.simpleName, "[activate] will activate #$i")
+        app.currentAction = ActionEnum.ACTIVATE
+        startActivity(confirmation)
+
     }
 
 //        private boolean backup(int i) {
@@ -138,39 +147,36 @@ class GridActivity : AppCompatActivity() {
 //            }
 //            return super.onKeyDown(i, keyEvent);
 //        }
+
+    private fun write() {
+
+
+        // TODO: rever os write!!!
+//        val dialogProperties = DialogProperties()
+//        dialogProperties.selection_mode = 0;
+//        dialogProperties.selection_type = 0;
+//        dialogProperties.offset = File(app.folderController.getDirectory(FolderController.DIRECTORY_RESTORE)!!)
+//        dialogProperties.root = File(DialogConfigs.DIRECTORY_SEPERATOR)
 //
-//        private void restoreFileChooser() {
-//            FolderController folderController = new FolderController(this);
-//            DialogProperties dialogProperties = new DialogProperties();
-//            dialogProperties.selection_mode = 0;
-//            dialogProperties.selection_type = 0;
-//            dialogProperties.offset = new File(folderController.getDirectory(FolderController.DIRECTORY_RESTORE));
-//            dialogProperties.root = new File(DialogConfigs.DIRECTORY_SEPERATOR);
-//            dialogProperties.error_dir = new File(DialogConfigs.DEFAULT_DIR);
-//            dialogProperties.extensions = new String[]{"bin"};
-//            FilePickerDialog filePickerDialog = new FilePickerDialog(this, dialogProperties);
-//            filePickerDialog.setTitle("Select a File");
-//            filePickerDialog.setDialogSelectionListener(new DialogSelectionListener() {
-//                FolderController folderController = new FolderController(GridActivity.this.getApplicationContext());
+//        dialogProperties.error_dir = File(DialogConfigs.DEFAULT_DIR);
+//        dialogProperties.extensions = arrayOf("bin")
 //
-//                public void onSelectedFilePaths(String[] strArr) {
-//                    if (strArr.length != 0) {
-//                        NFCApp nFCApp = (NFCApp) GridActivity.this.getApplication();
-//                        nFCApp.writeFile = strArr[0].toString();
-//                        String access$100 = GridActivity.this.log_name;
-//                        Log.d(access$100, "got filename: " + nFCApp.writeFile);
-//                        nFCApp.setStatus("Please tap and hold to write bank!");
-//                        nFCApp.setAction(NFCApp.AppAction.ACTION_WRITE);
-//                        GridActivity.this.setResult(-1, new Intent(GridActivity.this, MainActivity.class));
-//                        GridActivity.this.finish();
-//                        return;
-//                    }
-//                    Toast.makeText(GridActivity.this, "Please select a file", 1).show();
+//        val filePickerDialog = FilePickerDialog(this, dialogProperties);
+//        filePickerDialog.setTitle("Select a File");
+//        filePickerDialog.setDialogSelectionListener(DialogSelectionListener() {
+//            fun onSelectedFilePaths(strArr: Array<String>) {
+//                if (strArr.isNotEmpty()) {
+//                    app.writeFile = strArr[0]
+//                    app.currentAction = ActionEnum.WRITE
+//
+//                    Log.d(this::class.simpleName, "[write] got filename: " + app.writeFile)
+//
+//                    startActivity(confirmation)
 //                }
-//            });
-//            filePickerDialog.show();
-//        }
-//    }
+//            }
+//        })
+//        filePickerDialog.show()
+    }
 
 
 
