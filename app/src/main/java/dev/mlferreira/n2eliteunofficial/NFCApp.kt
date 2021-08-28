@@ -11,6 +11,7 @@ class NFCApp : Application() {
     var bankCount = MAX_BANKS
     var currentBank = -1
     var currentAction: ActionEnum = ActionEnum.NONE
+
     var pickerValue = 0
     lateinit var folderController: FolderController
     var lastPick = 0
@@ -18,6 +19,9 @@ class NFCApp : Application() {
 
     var writeFile: String? = null
     var writeGuid: String? = null
+
+    var intParam: Int = -1
+    var stringParam: String? = null
 
 
     override fun onCreate() {

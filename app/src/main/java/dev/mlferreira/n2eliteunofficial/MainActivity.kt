@@ -1,11 +1,9 @@
 package dev.mlferreira.n2eliteunofficial
 
 import android.app.PendingIntent
-import android.app.PendingIntent.FLAG_ONE_SHOT
 import android.content.Intent
 import android.content.IntentFilter
 import android.nfc.NfcAdapter
-import android.nfc.Tag
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.provider.Settings
@@ -13,7 +11,6 @@ import android.util.Log
 import android.view.View
 import android.widget.TextView
 import android.widget.Toast
-import com.smartrac.nfc.NfcNtag
 
 
 class MainActivity : AppCompatActivity() {

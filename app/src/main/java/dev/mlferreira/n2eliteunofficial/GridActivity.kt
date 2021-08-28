@@ -152,30 +152,30 @@ class GridActivity : AppCompatActivity() {
 
 
         // TODO: rever os write!!!
-//        val dialogProperties = DialogProperties()
-//        dialogProperties.selection_mode = 0;
-//        dialogProperties.selection_type = 0;
-//        dialogProperties.offset = File(app.folderController.getDirectory(FolderController.DIRECTORY_RESTORE)!!)
-//        dialogProperties.root = File(DialogConfigs.DIRECTORY_SEPERATOR)
-//
-//        dialogProperties.error_dir = File(DialogConfigs.DEFAULT_DIR);
-//        dialogProperties.extensions = arrayOf("bin")
-//
-//        val filePickerDialog = FilePickerDialog(this, dialogProperties);
-//        filePickerDialog.setTitle("Select a File");
-//        filePickerDialog.setDialogSelectionListener(DialogSelectionListener() {
-//            fun onSelectedFilePaths(strArr: Array<String>) {
-//                if (strArr.isNotEmpty()) {
-//                    app.writeFile = strArr[0]
-//                    app.currentAction = ActionEnum.WRITE
-//
-//                    Log.d(this::class.simpleName, "[write] got filename: " + app.writeFile)
-//
-//                    startActivity(confirmation)
-//                }
-//            }
-//        })
-//        filePickerDialog.show()
+        val dialogProperties = DialogProperties()
+        dialogProperties.selection_mode = 0;
+        dialogProperties.selection_type = 0;
+        dialogProperties.offset = File(app.folderController.getDirectory(FolderController.DIRECTORY_RESTORE)!!)
+        dialogProperties.root = File(DialogConfigs.DIRECTORY_SEPERATOR)
+
+        dialogProperties.error_dir = File(DialogConfigs.DEFAULT_DIR);
+        dialogProperties.extensions = arrayOf("bin")
+
+        val filePickerDialog = FilePickerDialog(this, dialogProperties);
+        filePickerDialog.setTitle("Select a File");
+        filePickerDialog.setDialogSelectionListener(DialogSelectionListener() {
+            fun onSelectedFilePaths(strArr: Array<String>) {
+                if (strArr.isNotEmpty()) {
+                    app.writeFile = strArr[0]
+                    app.currentAction = ActionEnum.WRITE
+
+                    Log.d(this::class.simpleName, "[write] got filename: " + app.writeFile)
+
+                    startActivity(confirmation)
+                }
+            }
+        })
+        filePickerDialog.show()
     }
 
 

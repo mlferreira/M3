@@ -416,6 +416,7 @@ public class NfcNtag implements TagTechnology {
         return resp;
     }
 
+    // CONFERIR!!!!!
     public boolean amiiboFastWrite(int addr, int bank, byte[] data) {
         return amiiboWrite(addr, bank, data);
     }

@@ -11,7 +11,7 @@ import android.util.Log
 import android.view.View
 import android.widget.TextView
 import android.widget.Toast
-import com.smartrac.nfc.NfcNtag
+import dev.mlferreira.n2eliteunofficial.nfc.N2Tag
 import dev.mlferreira.n2eliteunofficial.util.ActionEnum
 import java.lang.IllegalStateException
 
@@ -19,7 +19,7 @@ import java.lang.IllegalStateException
 class NFCTapActivity : AppCompatActivity() {
 
     private lateinit var app: NFCApp
-    var nfcNtag: NfcNtag? = null
+    var nfcNtag: N2Tag? = null
     private var nfcTag: Tag? = null
     private var nfcAdapter: NfcAdapter? = null
     private var nfcPendingIntent: PendingIntent? = null
@@ -76,7 +76,7 @@ class NFCTapActivity : AppCompatActivity() {
         Log.d(this::class.simpleName, "[handleNFC] started")
 
         nfcTag = nIntent.getParcelableExtra(NfcAdapter.EXTRA_TAG)
-        nfcNtag = NfcNtag.get(nfcTag)
+        nfcNtag = N2Tag(nfcTag!!)
 
         if (!nfcNtag!!.isConnected) {
             nfcNtag!!.connect()
@@ -85,7 +85,7 @@ class NFCTapActivity : AppCompatActivity() {
         return when(app.currentAction) {
             ActionEnum.BANK_COUNT -> {
                 Log.d(this::class.simpleName, "[handleNFC] changing bank count to ${app.pickerValue}")
-                if (nfcNtag!!.amiiboSetBankcount(app.pickerValue) == null) {
+                if (nfcNtag!!.setBankCount(app.pickerValue) == null) {
                     Log.e(this::class.simpleName, "[handleNFC] setting bank count returned null")
                     showErrorAndReturn("ERROR: Failed to set bank count! Please try again.")
                 } else {
@@ -95,7 +95,7 @@ class NFCTapActivity : AppCompatActivity() {
             }
             ActionEnum.ACTIVATE -> {
                 Log.d(this::class.simpleName, "[handleNFC] changing bank count to ${app.writeBank}")
-                if (nfcNtag!!.amiiboActivateBank(app.writeBank) == null) {
+                if (nfcNtag!!.setActiveBank(app.writeBank) == null) {
                     Log.e(this::class.simpleName, "[handleNFC] activating bank count returned null")
                     showErrorAndReturn("ERROR: Failed to set bank count! Please try again.")
                 } else {
@@ -138,7 +138,7 @@ class NFCTapActivity : AppCompatActivity() {
 
         // TODO: check fast write?
 
-        if (nfcNtag!!.amiiboWrite(0, app.writeBank, bArr)) {
+        if (nfcNtag!!.write(0, app.writeBank, bArr)) {
             showErrorAndReturn("Could not write amiibo to bank #" + (app.writeBank and 255) + 1)
             return false
         }

@@ -11,11 +11,10 @@ import android.view.View
 import android.widget.NumberPicker
 import android.widget.RelativeLayout
 import android.widget.TextView
-import android.widget.Toast
 import androidx.recyclerview.widget.ItemTouchHelper
-import com.smartrac.nfc.NfcNtag
 import dev.mlferreira.n2eliteunofficial.entity.Amiibo
 import dev.mlferreira.n2eliteunofficial.entity.Bank
+import dev.mlferreira.n2eliteunofficial.nfc.N2Tag
 import dev.mlferreira.n2eliteunofficial.util.ActionEnum
 import dev.mlferreira.n2eliteunofficial.util.toHex
 
@@ -24,9 +23,7 @@ class MenuActivity : AppCompatActivity() {
 
     private lateinit var app: NFCApp
     private lateinit var confirmation: Intent
-
-    var nfcNtag: NfcNtag? = null
-    private var nfcTag: Tag? = null
+    private var tag: N2Tag? = null
 
     private var currentBank: Int = -1
         set (value) {
@@ -54,22 +51,21 @@ class MenuActivity : AppCompatActivity() {
 
 
 
-    fun getTagInfo() {
+    private fun getTagInfo() {
         Log.d(this::class.simpleName, "[getTagInfo] started")
 
         getNFCTag()
 
-        val info = this.nfcNtag!!.amiiboGetVersion()
+        val info = tag?.status
 
         if (info == null || info.size < 2) {
-            Toast
-                .makeText(this, "info wrong size ($info)", Toast.LENGTH_LONG)
-                .show()
+            Log.e(this::class.simpleName, "[getTagInfo] info wrong size (${info?.toHex()})")
+            return
         }
 
         currentBank = info[0].toInt()
         numBanks = info[1].toInt()
-        val tagID = nfcNtag?.amiiboReadSig()?.toHex()
+        val tagID = tag?.signature?.toHex() ?: ""
 
         findViewById<TextView>(R.id.text_tag_id).text = getString(R.string.tag_id, tagID)
         findViewById<TextView>(R.id.text_bank_count).text = getString(R.string.bank_count, numBanks)
@@ -77,10 +73,10 @@ class MenuActivity : AppCompatActivity() {
 
 
         for (i in 0..numBanks) {
-            val amiiboHex = nfcNtag?.amiiboFastRead(21, 22, i)
+            val amiiboHex = tag?.fastRead(21, 22, i)
             if (amiiboHex != null && amiiboHex.size == 8) {
-                val amiibo = Amiibo(amiiboHex)
-                val tagId = nfcNtag?.amiiboFastRead(0, 1, i)
+                val amiibo = Amiibo(amiiboHex, this)
+                val tagId = tag?.fastRead(0, 1, i)
                 if (tagId != null && tagId.size == 8) {
                     app.banks[i] = Bank(amiibo, tagId)
                 }
@@ -129,17 +125,18 @@ class MenuActivity : AppCompatActivity() {
 
     private fun reconnectTag() {
         Log.d(this::class.simpleName, "[reconnectTag] started")
-        if (nfcNtag?.isConnected == true) {
-            nfcNtag?.close()
+        if (tag?.isConnected == true) {
+            tag?.close()
         }
-        nfcNtag?.connect()
+        tag?.connect()
     }
 
     private fun getNFCTag() {
-        nfcNtag?.close()
+        tag?.close()
 
-        nfcTag = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG)
-        nfcNtag = NfcNtag.get(nfcTag)
+        val nfcTag = intent.getParcelableExtra<Tag>(NfcAdapter.EXTRA_TAG) ?: return
+
+        tag = N2Tag(nfcTag)
 
         reconnectTag()
     }
