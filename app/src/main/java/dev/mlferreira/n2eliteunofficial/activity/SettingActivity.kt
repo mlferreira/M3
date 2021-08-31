@@ -1,13 +1,8 @@
-package dev.mlferreira.n2eliteunofficial
+package dev.mlferreira.n2eliteunofficial.activity
 
-import android.content.Context
 import android.os.Bundle
-import android.preference.CheckBoxPreference
-import android.preference.Preference
-import android.preference.Preference.OnPreferenceChangeListener
-import android.preference.Preference.OnPreferenceClickListener
 import android.preference.PreferenceActivity
-import java.io.File
+import dev.mlferreira.n2eliteunofficial.R
 
 class SettingActivity : PreferenceActivity() {
 

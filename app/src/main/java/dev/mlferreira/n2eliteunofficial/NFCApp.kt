@@ -3,6 +3,7 @@ package dev.mlferreira.n2eliteunofficial
 import android.app.Application
 import dev.mlferreira.n2eliteunofficial.entity.Bank
 import dev.mlferreira.n2eliteunofficial.entity.Bank.Companion.MAX_BANKS
+import dev.mlferreira.n2eliteunofficial.rest.FolderController
 import dev.mlferreira.n2eliteunofficial.util.ActionEnum
 
 class NFCApp : Application() {

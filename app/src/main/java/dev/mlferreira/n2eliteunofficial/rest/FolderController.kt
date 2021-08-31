@@ -1,4 +1,4 @@
-package dev.mlferreira.n2eliteunofficial
+package dev.mlferreira.n2eliteunofficial.rest
 
 import android.content.Context;
 import android.os.Environment

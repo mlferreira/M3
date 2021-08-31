@@ -1,4 +1,4 @@
-package dev.mlferreira.n2eliteunofficial
+package dev.mlferreira.n2eliteunofficial.rest
 
 import android.app.Activity
 import android.content.pm.PackageManager

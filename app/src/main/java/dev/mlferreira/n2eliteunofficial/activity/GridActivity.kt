@@ -1,4 +1,4 @@
-package dev.mlferreira.n2eliteunofficial
+package dev.mlferreira.n2eliteunofficial.activity
 
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
@@ -9,6 +9,10 @@ import com.github.angads25.filepicker.controller.DialogSelectionListener
 import com.github.angads25.filepicker.model.DialogConfigs
 import com.github.angads25.filepicker.model.DialogProperties
 import com.github.angads25.filepicker.view.FilePickerDialog
+import dev.mlferreira.n2eliteunofficial.rest.FolderController
+import dev.mlferreira.n2eliteunofficial.ImageAdapter
+import dev.mlferreira.n2eliteunofficial.NFCApp
+import dev.mlferreira.n2eliteunofficial.R
 import dev.mlferreira.n2eliteunofficial.entity.Amiibo.Companion.DUMMY
 import dev.mlferreira.n2eliteunofficial.util.ActionEnum
 import java.io.File
@@ -49,7 +53,7 @@ class GridActivity : AppCompatActivity() {
         app.writeBank = i
 
         // empty bank - add new amiibo
-        if (app.banks[i].amiibo.characterIdHex == DUMMY) {
+        if (app.banks[i].amiibo.id == DUMMY) {
             Log.d(this::class.simpleName, "[activate] bank #$i is empty - skip to add new")
             write()
         }

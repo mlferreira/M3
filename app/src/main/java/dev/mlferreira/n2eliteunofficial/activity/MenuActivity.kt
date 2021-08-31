@@ -1,4 +1,4 @@
-package dev.mlferreira.n2eliteunofficial
+package dev.mlferreira.n2eliteunofficial.activity
 
 import android.app.AlertDialog
 import android.content.Intent
@@ -12,6 +12,8 @@ import android.widget.NumberPicker
 import android.widget.RelativeLayout
 import android.widget.TextView
 import androidx.recyclerview.widget.ItemTouchHelper
+import dev.mlferreira.n2eliteunofficial.NFCApp
+import dev.mlferreira.n2eliteunofficial.R
 import dev.mlferreira.n2eliteunofficial.entity.Amiibo
 import dev.mlferreira.n2eliteunofficial.entity.Bank
 import dev.mlferreira.n2eliteunofficial.nfc.N2Tag

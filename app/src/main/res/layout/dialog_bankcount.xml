@@ -8,13 +8,13 @@
     android:layout_height="wrap_content"
     android:layout_centerHorizontal="true"
     android:layout_centerVertical="true"
-    tools:context=".MenuActivity">
+    tools:context=".activity.MenuActivity">
 
     <NumberPicker
         android:id="@+id/picker_bank_count"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
-        tools:context=".MenuActivity"/>
+        tools:context=".activity.MenuActivity"/>
 
 </RelativeLayout>

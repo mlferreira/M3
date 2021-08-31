@@ -3,6 +3,7 @@ package dev.mlferreira.n2eliteunofficial
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -10,14 +11,13 @@ import android.view.ViewTreeObserver
 import android.widget.BaseAdapter
 import android.widget.ImageView
 import android.widget.TextView
-import android.widget.Toast
-import com.android.volley.Request
-import com.android.volley.Response
-import com.android.volley.toolbox.ImageRequest
-import com.android.volley.toolbox.StringRequest
-import com.android.volley.toolbox.Volley
+import com.squareup.picasso.Picasso
 import dev.mlferreira.n2eliteunofficial.entity.Amiibo
 import dev.mlferreira.n2eliteunofficial.entity.Bank
+import okhttp3.ResponseBody
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 import java.lang.Exception
 
 
@@ -34,6 +34,8 @@ class ImageAdapter(
     )
 
     private val inflater: LayoutInflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+
+    private val amiiboManager = AmiiboManager(context)
 
     override fun getCount(): Int {
         return bankCount
@@ -63,40 +65,62 @@ class ImageAdapter(
         try {
             val amiibo: Amiibo = allBanks[position].amiibo
 
-            if (amiibo.hexId.equals(Amiibo.DUMMY, ignoreCase = true)) {
+            if (amiibo.id.equals(Amiibo.DUMMY, ignoreCase = true)) {
                 viewHolder.text.text = "EMPTY"
             } else {
                 viewHolder.text.text = "Loading..."
 
-                val queue = Volley.newRequestQueue(context)
+                amiiboManager.getAmiibo(amiibo.id).enqueue(
+                    object : Callback<Amiibo?> {
+                        override fun onResponse(call: Call<Amiibo?>, response: Response<Amiibo?>) {
+                            if (!response.isSuccessful) {
+                                viewHolder.text.text = "No connection"
+                                return
+                            }
+                            Log.d(this::class.simpleName, "[getView] (amiibo) onResponse success")
+                            response.body()
+                                ?.let { amiibo ->
+                                    viewHolder.text.text = amiibo.name
+                                    allBanks[position].amiibo.name = amiibo.name
+                                    allBanks[position].amiibo.character = amiibo.character
+                                }
+                        }
 
-                val stringRequest = StringRequest(
-                    Request.Method.GET,
-                    "${Amiibo.API_URL}?id=${amiibo.hexId}",
-                    { response ->
-
-//                        val resp = JsonParser.parseString(response)
-//
-//                        val json: JsonObject = if (resp.isJsonArray) {
-//                            resp.asJsonArray.first().asJsonObject
-//                        } else {
-//                            resp.asJsonObject
-//                        }.get("amiibo").asJsonArray.first().asJsonObject
-//
-
-//                        amiibo.name = json.get("name").asString
-                        amiibo.name = response.substringAfter("\"name\":").substringAfter('"').substringBefore('"')
-                        viewHolder.text.text = amiibo.name
-
-//                        amiibo.imageUrl = json.get("image").asString
-//                        amiibo.imageUrl = response.substringAfter("\"image\":").substringAfter('"').substringBefore('"')
-//                        setImage(viewHolder.image, amiibo.imageUrl)
-
-                    },
-                    { e -> Toast.makeText(context, "failed ${amiibo.hexId} - ${e.networkResponse.statusCode}", Toast.LENGTH_LONG).show() }
+                        override fun onFailure(call: Call<Amiibo?>, th: Throwable) {
+                            viewHolder.text.text = "No connection"
+                        }
+                    }
                 )
 
-                queue.add(stringRequest)
+                Picasso.get().load("${Amiibo.API_URL}/images/${amiibo.id}${Amiibo.IMAGE_EXTENSION}").into(viewHolder.image);
+
+//                amiiboManager.getImage(amiibo.id).enqueue(
+//                    object : Callback<ResponseBody?> {
+//                        override fun onResponse(call: Call<ResponseBody?>, response: Response<ResponseBody?>) {
+//                            Log.d(this::class.simpleName, "[getView] onResponse")
+//                            if (!response.isSuccessful) {
+//                                viewHolder.image.setImageResource(R.drawable.empty)
+//                                return
+//                            }
+//                            Log.d(this::class.simpleName, "[getView] (image) onResponse success")
+//                            response.body()
+////                                ?.bytes()
+//                                ?.let { bArr ->
+////                                    allBanks[position].amiibo.imageBytes = bArr
+//                                    try {
+//                                        setScaledImage(viewHolder.image, bArr.bytes())
+//                                    } catch (e: Exception) {
+//                                        Log.e(this::class.simpleName, "[getView] onResponse - ${e.message}")
+//                                    }
+//                                }
+//                        }
+//
+//                        override fun onFailure(call: Call<ResponseBody?>, th: Throwable) {
+//                            viewHolder.image.setImageResource(R.drawable.empty)
+//                        }
+//                    }
+//                )
+
             }
 
         } catch (e: Exception) {
@@ -106,29 +130,6 @@ class ImageAdapter(
         return view
     }
 
-    private fun setImage(imageView: ImageView, imgUrl: String?) {
-        if (imgUrl == null) {
-            imageView.setImageResource(R.drawable.empty)
-            return
-        }
-
-        val queue = Volley.newRequestQueue(context)
-
-        val stringRequest = ImageRequest(
-            imgUrl,
-            Response.Listener<Bitmap> { image ->
-                setScaledImage(imageView, image)
-            },
-            0,
-            0,
-            ImageView.ScaleType.CENTER_INSIDE,
-            Bitmap.Config.RGB_565,
-            Response.ErrorListener { imageView.setImageResource(R.drawable.empty) }
-        )
-
-        queue.add(stringRequest)
-
-    }
 
     private fun setScaledImage(imageView: ImageView, bArr: ByteArray) {
         imageView.viewTreeObserver.addOnPreDrawListener(object :

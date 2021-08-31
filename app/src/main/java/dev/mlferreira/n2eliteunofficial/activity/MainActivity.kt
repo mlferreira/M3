@@ -1,4 +1,4 @@
-package dev.mlferreira.n2eliteunofficial
+package dev.mlferreira.n2eliteunofficial.activity
 
 import android.app.PendingIntent
 import android.content.Intent
@@ -11,6 +11,8 @@ import android.util.Log
 import android.view.View
 import android.widget.TextView
 import android.widget.Toast
+import dev.mlferreira.n2eliteunofficial.rest.PermissionController
+import dev.mlferreira.n2eliteunofficial.R
 
 
 class MainActivity : AppCompatActivity() {

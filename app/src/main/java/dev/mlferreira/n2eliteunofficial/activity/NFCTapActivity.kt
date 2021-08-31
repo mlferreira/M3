@@ -1,4 +1,4 @@
-package dev.mlferreira.n2eliteunofficial
+package dev.mlferreira.n2eliteunofficial.activity
 
 import android.app.PendingIntent
 import android.content.Intent
@@ -8,12 +8,11 @@ import android.nfc.Tag
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
-import android.view.View
-import android.widget.TextView
 import android.widget.Toast
+import dev.mlferreira.n2eliteunofficial.NFCApp
+import dev.mlferreira.n2eliteunofficial.R
 import dev.mlferreira.n2eliteunofficial.nfc.N2Tag
 import dev.mlferreira.n2eliteunofficial.util.ActionEnum
-import java.lang.IllegalStateException
 
 
 class NFCTapActivity : AppCompatActivity() {
