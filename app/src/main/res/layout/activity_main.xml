@@ -63,7 +63,7 @@
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="22dip"
         android:onClick="btnSettingClick"
-        android:text="Settings"
+        android:text="@string/btn_settings"
         android:visibility="visible" />
 
     <TextView

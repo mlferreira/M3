@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tap_and_hold">Aproxime sua tag e aguarde para salvar as alterações</string>
+    <string name="scan_tag_message">Aproxime sua tag para começar</string>
+    <string name="welcome_message">Bem vindo(a)!</string>
+    <string name="enable_nfc_message">NFC deve estar ativado!</string>
+    <string name="current_bank">Ativado: #%1$d</string>
+    <string name="bank_count"># bancos: #%1$d</string>
+    <string name="btn_settings">Configurações</string>
+    <string name="btn_change_number_of_banks">Alterar num. de bancos</string>
+    <string name="lock">Trancar</string>
+    <string name="btn_manage_banks">Gerir bancos</string>
+    <string name="unknown">Desconhecido</string>
+</resources>

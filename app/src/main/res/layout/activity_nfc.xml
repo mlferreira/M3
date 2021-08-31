@@ -73,14 +73,14 @@
         android:layout_centerHorizontal="true"
         android:layout_marginTop="40dip"
         android:onClick="btnManageBanksClick"
-        android:text="Manage Banks"
+        android:text="@string/btn_manage_banks"
         android:textAlignment="center" />
 
     <Button
         android:id="@+id/button_set_bank_no"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Change Number of Banks"
+        android:text="@string/btn_change_number_of_banks"
         android:textAlignment="center"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="20dip"
@@ -91,7 +91,7 @@
         android:id="@+id/button_lock"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Lock"
+        android:text="@string/lock"
         android:textAlignment="center"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="20dip"
@@ -107,7 +107,7 @@
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="22dip"
         android:onClick="btnSettingClick"
-        android:text="Settings"
+        android:text="@string/btn_settings"
         android:visibility="visible" />
 
     <TextView
