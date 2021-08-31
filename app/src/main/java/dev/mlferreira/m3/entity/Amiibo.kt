@@ -88,7 +88,7 @@ class Amiibo (
 
     companion object {
         const val DUMMY = "FFFFFFFFFFFFFFFF"
-        const val API_URL = "https://raw.githubusercontent.com/mlferreira/N2Elite_UnofficialApp/main/amiibos/"
+        const val API_URL = "https://raw.githubusercontent.com/mlferreira/M3/main/amiibos/"
         const val DATA_EXTENSION = ".json";
         const val IMAGE_EXTENSION = ".png";
     }
