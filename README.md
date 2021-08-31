@@ -1,4 +1,6 @@
-# N2Elite Unofficial App
+# M3 App
 
 
-a bad attempt at fixing the official N2Elite Android App
+this is a bad attempt at fixing the official N2 Elite Android App
+
+some stuff is not working yet
