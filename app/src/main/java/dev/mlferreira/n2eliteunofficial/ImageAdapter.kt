@@ -89,8 +89,8 @@ class ImageAdapter(
                         viewHolder.text.text = amiibo.name
 
 //                        amiibo.imageUrl = json.get("image").asString
-                        amiibo.imageUrl = response.substringAfter("\"image\":").substringAfter('"').substringBefore('"')
-                        setImage(viewHolder.image, amiibo.imageUrl)
+//                        amiibo.imageUrl = response.substringAfter("\"image\":").substringAfter('"').substringBefore('"')
+//                        setImage(viewHolder.image, amiibo.imageUrl)
 
                     },
                     { e -> Toast.makeText(context, "failed ${amiibo.hexId} - ${e.networkResponse.statusCode}", Toast.LENGTH_LONG).show() }
