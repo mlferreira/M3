@@ -23,7 +23,7 @@ class FolderController(
         createDefault(DIRECTORY_RESTORE, "backups");
     }
 
-    private fun saveDirectory(key: String, value: String) {
+    fun saveDirectory(key: String, value: String) {
         context.getSharedPreferences(SETTINGS_KEY, 0)
             .edit()
             .putString(key, value)

@@ -4,8 +4,6 @@ import android.nfc.Tag
 import android.nfc.tech.NfcA
 import android.nfc.tech.TagTechnology
 import android.util.Log
-import com.smartrac.nfc.NfcNtagOpcode
-import com.smartrac.nfc.NfcNtagTtStatus
 import dev.mlferreira.n2eliteunofficial.util.toHex
 import java.io.IOException
 import java.lang.Exception
@@ -81,7 +79,7 @@ class N2Tag(
         val req = ByteArray(2)
         val resp: ByteArray
         val cnt: Int
-        req[0] = NfcNtagOpcode.READ_CNT
+        req[0] = N2TagOpCode.READ_CNT.byte
         req[1] = 0x02
         try {
             resp = nfca.transceive(req)
@@ -99,7 +97,7 @@ class N2Tag(
             return null
         }
         val req = ByteArray(5)
-        req[0] = NfcNtagOpcode.PWD_AUTH
+        req[0] = N2TagOpCode.PWD_AUTH.byte
         System.arraycopy(pwd, 0, req, 1, 4)
         // result will be the PACK
         return transceive(req)
@@ -109,7 +107,7 @@ class N2Tag(
     fun sectorSelect(sector: Byte): Boolean {
         val req1 = ByteArray(2)
         val req2 = ByteArray(4)
-        req1[0] = NfcNtagOpcode.SECTOR_SELECT
+        req1[0] = N2TagOpCode.SECTOR_SELECT.byte
         req1[1] = 0xFF.toByte()
         try {
             nfca.transceive(req1)
@@ -133,7 +131,7 @@ class N2Tag(
     fun readTtStatus(): NfcNtagTtStatus? {
         val req = ByteArray(2)
         val resp: ByteArray
-        req[0] = NfcNtagOpcode.READ_TT_STATUS
+        req[0] = N2TagOpCode.READ_TT_STATUS.byte
         req[1] = 0x00
         resp = try {
             nfca.transceive(req)
@@ -153,7 +151,7 @@ class N2Tag(
     fun mfulcAuth1(): ByteArray? {
         val req = ByteArray(2)
         val resp: ByteArray?
-        req[0] = NfcNtagOpcode.MFULC_AUTH1
+        req[0] = N2TagOpCode.MFULC_AUTH1.byte
         req[1] = 0x00
         resp = try {
             nfca.transceive(req)
@@ -175,7 +173,7 @@ class N2Tag(
         }
         val req = ByteArray(17)
         val resp: ByteArray
-        req[0] = NfcNtagOpcode.MFULC_AUTH2
+        req[0] = N2TagOpCode.MFULC_AUTH2.byte
         resp = try {
             System.arraycopy(ekRndAB, 0, req, 1, 16)
             nfca.transceive(req)
