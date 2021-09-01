@@ -1,7 +1,10 @@
 package dev.mlferreira.m3.rest
 
 import android.content.Context;
-import android.os.Environment
+import android.net.Uri
+import androidx.core.net.toFile
+import androidx.preference.PreferenceManager
+import dev.mlferreira.m3.R
 import java.io.File;
 import java.io.FileInputStream
 import java.io.FileOutputStream;
@@ -12,37 +15,17 @@ class FolderController(
     val context: Context
 ) {
 
-    companion object {
-        const val DIRECTORY_BACKUP = "backup_dir";
-        const val DIRECTORY_RESTORE = "restore_dir";
-        const val SETTINGS_KEY = "amiiqo_pref";
-    }
 
-    init {
-        createDefault(DIRECTORY_BACKUP, "backups");
-        createDefault(DIRECTORY_RESTORE, "backups");
-    }
+    fun getDirectory(key: String): Uri
+        = Uri.parse(PreferenceManager.getDefaultSharedPreferences(context).getString(key, createDefault(key)))
 
-    fun saveDirectory(key: String, value: String) {
-        context.getSharedPreferences(SETTINGS_KEY, 0)
-            .edit()
-            .putString(key, value)
-            .apply()
-    }
+    private fun createDefault(key: String) = context.dataDir.absolutePath + "/" + key
 
-    fun getDirectory(key: String): String?
-        = context.getSharedPreferences(SETTINGS_KEY, 0).getString(key, "DEFAULT");
+    fun readBlobFromFile(path: String): ByteArray = File(path).readBytes()
 
-
-    private fun createDefault(key: String, value: String) {
-        if (!this.context.getSharedPreferences(SETTINGS_KEY, 0).contains(key)) {
-            saveDirectory(key, "/mnt/" + value);
-        }
-    }
-
-    fun readBlobFromFile(str: String): ByteArray? {
+    fun readBlobFromFile__(path: String): ByteArray? {
         try {
-            val file = File(str)
+            val file = File(path)
             val bArr = ByteArray(file.length().toInt())
             FileInputStream(file).read(bArr, 0, bArr.size);
             return bArr
@@ -52,20 +35,19 @@ class FolderController(
     }
 
     fun writeBlobToFile(str: String, bArr: ByteArray): Boolean {
-        return writeBlobToFile(str, bArr, DIRECTORY_BACKUP);
+        return writeBlobToFile(str, bArr, context.getString(R.string.key_backup_folder))
     }
 
-    fun writeBlobToFile(str: String, bArr: ByteArray, str2: String): Boolean {
-        val directory = getDirectory(str2) ?: Environment.getExternalStorageDirectory().absolutePath
+    fun writeBlobToFile(fileName: String, content: ByteArray, key: String): Boolean {
+        val directory = getDirectory(key).toFile()
 
-        val file = File(directory);
-        if (file.mkdirs()) {
+        if (directory.mkdirs()) {
             return false
         }
 
         try {
-            val fileOutputStream = FileOutputStream(File(file, str))
-            fileOutputStream.write(bArr)
+            val fileOutputStream = FileOutputStream(File(directory, fileName))
+            fileOutputStream.write(content)
             fileOutputStream.close()
             return true
         } catch (e: Exception ) {

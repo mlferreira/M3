@@ -8,9 +8,9 @@ import androidx.core.app.ActivityCompat
 class PermissionController(private val activity: Activity) {
 
     private val permissionsNeeded = listOf(
-//        android.Manifest.permission.READ_EXTERNAL_STORAGE,
+        android.Manifest.permission.READ_EXTERNAL_STORAGE,
         android.Manifest.permission.NFC,
-//        android.Manifest.permission.INTERNET,
+        android.Manifest.permission.INTERNET,
     )
 
     init {

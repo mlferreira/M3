@@ -17,8 +17,10 @@
     <!--    settings    -->
     <string name="title_settings">Settings</string>
     <string name="title_default_settings">Default Settings</string>
+    <string name="key_restore_folder">restore_pref</string>
     <string name="title_restore_folder">Restore Folder</string>
     <string name="summary_restore_folder">folder location</string>
+    <string name="key_backup_folder">backup_pref</string>
     <string name="title_backup_folder">Backup/Dump Folder</string>
     <string name="summary_backup_folder">folder location</string>
     <string name="title_nfc_settings">NFC Settings</string>

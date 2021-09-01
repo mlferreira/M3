@@ -3,23 +3,26 @@
     xmlns:android="http://schemas.android.com/apk/res/android">
 
     <PreferenceCategory
-        android:key="pref_key_storage_settings"
         android:title="@string/title_default_settings">
 
         <Preference
-            android:key="restore_pref"
+            android:key="@string/key_restore_folder"
             android:summary="@string/summary_restore_folder"
-            android:title="@string/title_restore_folder" />
+            android:title="@string/title_restore_folder" >
+            <intent android:action="android.intent.action.OPEN_DOCUMENT_TREE"/>
+        </Preference>
 
         <Preference
-            android:key="backup_pref"
+            android:key="@string/key_backup_folder"
             android:summary="@string/summary_backup_folder"
-            android:title="@string/title_backup_folder" />
+            android:title="@string/title_backup_folder" >
+            <intent android:action="android.intent.action.OPEN_DOCUMENT_TREE"/>
+        </Preference>
 
-    </PreferenceCategory>
+
+</PreferenceCategory>
 
     <PreferenceCategory
-        android:key="pref_key_storage_settings"
         android:title="@string/title_nfc_settings">
 
         <CheckBoxPreference
@@ -31,7 +34,6 @@
     </PreferenceCategory>
 
     <PreferenceCategory
-        android:key="pref_key_storage_settings"
         android:title="@string/title_misc_settings">
 
         <CheckBoxPreference

@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.widget.*
+import androidx.core.net.toFile
 import com.github.angads25.filepicker.controller.DialogSelectionListener
 import com.github.angads25.filepicker.model.DialogConfigs
 import com.github.angads25.filepicker.model.DialogProperties
@@ -156,7 +157,7 @@ class GridActivity : AppCompatActivity() {
         val dialogProperties = DialogProperties()
         dialogProperties.selection_mode = 0;
         dialogProperties.selection_type = 0;
-        dialogProperties.offset = File(app.folderController.getDirectory(FolderController.DIRECTORY_RESTORE)!!)
+        dialogProperties.offset = app.folderController.getDirectory(getString(R.string.key_restore_folder)).toFile()
         dialogProperties.root = File(DialogConfigs.DIRECTORY_SEPERATOR)
 
         dialogProperties.error_dir = File(DialogConfigs.DEFAULT_DIR);
