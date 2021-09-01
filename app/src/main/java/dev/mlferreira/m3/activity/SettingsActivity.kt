@@ -1,9 +1,7 @@
 package dev.mlferreira.m3.activity
 
-import android.app.Activity
-import android.content.Context
 import android.os.Bundle
-import android.text.Layout
+import android.util.Log
 import android.widget.FrameLayout
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
@@ -19,9 +17,10 @@ import java.io.File
 
 class SettingsActivity : AppCompatActivity() {
 
-    private var folderController: FolderController? = null
+//    private var folderController: FolderController? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        Log.d(this::class.simpleName, "[onCreate] started")
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_settings)
 
@@ -31,20 +30,12 @@ class SettingsActivity : AppCompatActivity() {
             if (savedInstanceState != null) {
                 return
             }
-
             supportFragmentManager
                 .beginTransaction()
                 .add(R.id.settings_frame_layout, SettingsFragment())
                 .commit()
         }
 
-//        //If you want to insert data in your settings
-//        val settingsFragment: SettingsFragment = SettingsFragment()
-////        settingsFragment. ...
-////        getSupportFragmentManager().beginTransaction().replace(R.id.<YourFrameLayout>,settingsFragment).commit()
-//
-//        //Else
-////        getSupportFragmentManager().beginTransaction().replace(R.id.<YourFrameLayout>,new <YourSettingsFragmentClass>()).commit();
     }
 
 }
@@ -53,11 +44,11 @@ class SettingsActivity : AppCompatActivity() {
 
 class SettingsFragment : PreferenceFragmentCompat() {
 
-    private var folderController: FolderController? = null
+//    private var folderController: FolderController? = null
 
-    override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String) {
-        super.onCreate(savedInstanceState)
-        addPreferencesFromResource(R.xml.preferences)
+    override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
+        Log.d(this::class.simpleName, "[onCreatePreferences] started")
+        setPreferencesFromResource(R.xml.preferences, rootKey)
 //        folderController = FolderController(this)
 
 //        defaultClick("restore_pref", "Select a Restore Folder", FolderController.DIRECTORY_RESTORE)
@@ -107,16 +98,19 @@ class SettingsFragment : PreferenceFragmentCompat() {
         val key: String = getString(R.string.key_dark_mode)
         val checkBoxPreference = preferenceManager.findPreference(key) as CheckBoxPreference?
 
-        checkBoxPreference?.onPreferenceChangeListener = Preference
-            .OnPreferenceChangeListener { preference, obj ->
-                obj as Boolean
-                if (obj) {
-                    AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
-                } else {
-                    AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
+        if (checkBoxPreference != null) {
+            checkBoxPreference.onPreferenceChangeListener = Preference
+                .OnPreferenceChangeListener { preference, obj ->
+                    obj as Boolean
+                    if (obj) {
+                        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+                    } else {
+                        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
+                    }
+                    requireActivity().recreate()
+                    true
                 }
-                true
-            }
+        }
     }
 
 }

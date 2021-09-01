@@ -77,8 +77,9 @@ class MainActivity : AppCompatActivity() {
     }
 
 
-    fun btnSettingClick(view: View?) = startActivity(Intent(this, SettingsActivity::class.java))
-
-    fun openNFCSettings(view: View?) = startActivity(Intent(Settings.ACTION_NFC_SETTINGS))
+    fun btnSettingClick(view: View?) {
+        Log.d(this::class.simpleName, "[btnSettingClick] started")
+        startActivity(Intent(this, SettingsActivity::class.java))
+    }
 
 }
