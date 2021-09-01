@@ -153,9 +153,6 @@ class GridActivity : AppCompatActivity() {
 //        }
 
     private fun write() {
-
-
-        // TODO: rever os write!!!
         val dialogProperties = DialogProperties()
         dialogProperties.selection_mode = 0;
         dialogProperties.selection_type = 0;

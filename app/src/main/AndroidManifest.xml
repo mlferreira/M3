@@ -67,7 +67,9 @@
             </intent-filter>
         </activity>
 
-        <activity android:name="dev.mlferreira.m3.activity.SettingActivity"/>
+        <activity
+            android:name="dev.mlferreira.m3.activity.SettingsActivity">
+        </activity>
 
     </application>
 

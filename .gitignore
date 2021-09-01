@@ -13,3 +13,6 @@
 .externalNativeBuild
 .cxx
 local.properties
+*.pepk
+private_key.pepk
+/resources

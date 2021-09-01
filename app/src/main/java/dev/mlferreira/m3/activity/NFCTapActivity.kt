@@ -3,15 +3,18 @@ package dev.mlferreira.m3.activity
 import android.app.PendingIntent
 import android.content.Intent
 import android.content.IntentFilter
+import android.content.SharedPreferences
 import android.nfc.NfcAdapter
 import android.nfc.Tag
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
+import androidx.preference.PreferenceManager
 import dev.mlferreira.m3.NFCApp
 import dev.mlferreira.m3.R
 import dev.mlferreira.m3.nfc.N2Tag
+import dev.mlferreira.m3.rest.FolderController
 import dev.mlferreira.m3.util.ActionEnum
 
 
@@ -124,23 +127,33 @@ class NFCTapActivity : AppCompatActivity() {
             return false
         }
 
-
         if (data.size < 540) {
             showErrorAndReturn("The file seems to be invalid. It must have at least 540 bytes.")
             return false
         }
+
+        val pref = PreferenceManager.getDefaultSharedPreferences(this)
+        val fastWrite = pref.getBoolean(getString(R.string.key_fast_write), true)
+        Log.w(this::class.simpleName, "[write] using fast write: $fastWrite")
 
         val bArr = ByteArray(540)
         System.arraycopy(data, 0, bArr, 0, 540)
 
         // TODO: check tagAuth()?
 
-        // TODO: check fast write?
 
-        if (nfcNtag!!.write(0, app.writeBank, bArr)) {
-            showErrorAndReturn("Could not write amiibo to bank #" + (app.writeBank and 255) + 1)
-            return false
+        if (fastWrite) {
+            if (nfcNtag!!.fastWrite(0, app.writeBank, bArr)) {
+                showErrorAndReturn("Could not write amiibo to bank #" + (app.writeBank and 255) + 1)
+                return false
+            }
+        } else {
+            if (nfcNtag!!.write(0, app.writeBank, bArr)) {
+                showErrorAndReturn("Could not write amiibo to bank #" + (app.writeBank and 255) + 1)
+                return false
+            }
         }
+
 
         return true
     }

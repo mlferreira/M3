@@ -13,4 +13,20 @@
     <string name="btn_change_number_of_banks">Change Number of Banks</string>
     <string name="lock">Lock</string>
     <string name="unknown">Unknown</string>
+
+    <!--    settings    -->
+    <string name="title_settings">Settings</string>
+    <string name="title_default_settings">Default Settings</string>
+    <string name="title_restore_folder">Restore Folder</string>
+    <string name="summary_restore_folder">folder location</string>
+    <string name="title_backup_folder">Backup/Dump Folder</string>
+    <string name="summary_backup_folder">folder location</string>
+    <string name="title_nfc_settings">NFC Settings</string>
+    <string name="summary_fast_write">Strongly Recommended</string>
+    <string name="chckbx_fast_write">Use Fast-Write</string>
+    <string name="key_fast_write">useFastWrite_pref</string>
+    <string name="title_misc_settings">Other</string>
+    <string name="key_dark_mode">forceDarkMode_pref</string>
+    <string name="summary_dark_mode">If unchecked, will use system default</string>
+    <string name="chckbx_dark_mode">Force Dark Mode</string>
 </resources>

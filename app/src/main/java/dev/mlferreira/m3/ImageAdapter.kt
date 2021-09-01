@@ -66,6 +66,9 @@ class ImageAdapter(
 
             if (amiibo.id.equals(Amiibo.DUMMY, ignoreCase = true)) {
                 viewHolder.text.text = "EMPTY"
+                Picasso.get()
+                    .load(R.drawable.empty_add)
+                    .into(viewHolder.image)
             } else {
                 viewHolder.text.text = "Loading..."
 
@@ -87,11 +90,16 @@ class ImageAdapter(
 
                         override fun onFailure(call: Call<Amiibo?>, th: Throwable) {
                             viewHolder.text.text = "No connection"
+                            Picasso.get()
+                                .load(R.drawable.empty_unknown)
+                                .into(viewHolder.image)
                         }
                     }
                 )
 
-                Picasso.get().load("${Amiibo.API_URL}/images/${amiibo.id}${Amiibo.IMAGE_EXTENSION}").into(viewHolder.image);
+                Picasso.get()
+                    .load("${Amiibo.API_URL}/images/${amiibo.id}${Amiibo.IMAGE_EXTENSION}")
+                    .into(viewHolder.image)
 
 //                amiiboManager.getImage(amiibo.id).enqueue(
 //                    object : Callback<ResponseBody?> {

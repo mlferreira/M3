@@ -11,6 +11,8 @@ import android.util.Log
 import android.view.View
 import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
+import androidx.appcompat.app.AppCompatDelegate.setDefaultNightMode
 import dev.mlferreira.m3.rest.PermissionController
 import dev.mlferreira.m3.R
 
@@ -25,6 +27,7 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         Log.d(this::class.simpleName, "[onCreate] started")
         super.onCreate(savedInstanceState)
+//        setDefaultNightMode(MODE_NIGHT_FOLLOW_SYSTEM)
         setContentView(R.layout.activity_main)
 
         nfcAdapter = NfcAdapter.getDefaultAdapter(this)
@@ -74,7 +77,7 @@ class MainActivity : AppCompatActivity() {
     }
 
 
-    fun btnSettingClick(view: View?) = startActivity(Intent(this, SettingActivity::class.java))
+    fun btnSettingClick(view: View?) = startActivity(Intent(this, SettingsActivity::class.java))
 
     fun openNFCSettings(view: View?) = startActivity(Intent(Settings.ACTION_NFC_SETTINGS))
 

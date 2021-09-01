@@ -118,7 +118,7 @@ class MenuActivity : AppCompatActivity() {
         builder.create().show()
     }
 
-    fun btnSettingClick(view: View?) = startActivity(Intent(this, SettingActivity::class.java))
+    fun btnSettingClick(view: View?) = startActivity(Intent(this, SettingsActivity::class.java))
 
     fun btnManageBanksClick(view: View?) = startActivity(Intent(this, GridActivity::class.java))
 
