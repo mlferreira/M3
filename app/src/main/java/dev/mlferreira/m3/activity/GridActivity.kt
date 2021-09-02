@@ -1,20 +1,29 @@
 package dev.mlferreira.m3.activity
 
+import android.app.Activity
+import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.provider.DocumentsContract.EXTRA_INITIAL_URI
 import android.util.Log
+import android.webkit.MimeTypeMap
 import android.widget.*
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.MimeTypeFilter
 import androidx.core.net.toFile
+import androidx.documentfile.provider.DocumentFile
 import com.github.angads25.filepicker.controller.DialogSelectionListener
 import com.github.angads25.filepicker.model.DialogConfigs
 import com.github.angads25.filepicker.model.DialogProperties
 import com.github.angads25.filepicker.view.FilePickerDialog
-import dev.mlferreira.m3.rest.FolderController
 import dev.mlferreira.m3.ImageAdapter
 import dev.mlferreira.m3.NFCApp
 import dev.mlferreira.m3.R
 import dev.mlferreira.m3.entity.Amiibo.Companion.DUMMY
+import dev.mlferreira.m3.rest.FolderController
 import dev.mlferreira.m3.util.ActionEnum
 import java.io.File
 
@@ -23,6 +32,7 @@ class GridActivity : AppCompatActivity() {
 
     private lateinit var app: NFCApp
     private lateinit var confirmation: Intent
+    private lateinit var readForBank: ActivityResultLauncher<Array<String>>
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -32,6 +42,21 @@ class GridActivity : AppCompatActivity() {
 
         app = application as NFCApp
         confirmation = Intent(this, NFCTapActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+
+        readForBank = registerForActivityResult(openFile(getString(R.string.key_restore_folder))) { uri: Uri ->
+            Log.d(this::class.simpleName, "[readForBank] uri $uri")
+
+            Log.d(this::class.simpleName, "[readForBank] uri type: ${contentResolver.getType(uri)}")
+
+            app.writeFile = uri.encodedPath
+            app.currentAction = ActionEnum.WRITE
+
+            Log.d(this::class.simpleName, "[readForBank] got filename: " + app.writeFile)
+
+            startActivity(confirmation)
+
+        }
+
 
         val gridView: GridView = findViewById(R.id.gridview)
 
@@ -54,9 +79,11 @@ class GridActivity : AppCompatActivity() {
         app.writeBank = i
 
         // empty bank - add new amiibo
-        if (app.banks[i].amiibo.id == DUMMY) {
+        if (app.banks[i].amiibo.id.equals(DUMMY, ignoreCase = true)) {
             Log.d(this::class.simpleName, "[activate] bank #$i is empty - skip to add new")
-            write()
+//            writeToBank()
+            readForBank.launch(arrayOf("*/*"))
+            return
         }
 
         // set bank as active
@@ -81,17 +108,13 @@ class GridActivity : AppCompatActivity() {
 //            restoreFileChooser();
 //            return true;
 //        }
-//
-//        private boolean empty(int i) {
-//            NFCApp nFCApp = (NFCApp) getApplication();
-//            this.app.writeBank = (byte) i;
-//            nFCApp.setStatus("Please tap and hold to empty bank!");
-//            nFCApp.setAction(NFCApp.AppAction.ACTION_EMPTY);
-//            setResult(-1, new Intent(this, MainActivity.class));
-//            finish();
-//            return true;
-//        }
-//
+
+        private fun empty(bank: Int) {
+            app.currentAction = ActionEnum.EMPTY
+            app.writeBank = bank
+            startActivity(confirmation)
+        }
+
 //        private boolean cheat(int i) {
 //            NFCApp nFCApp = (NFCApp) getApplication();
 //            this.app.writeBank = (byte) i;
@@ -153,33 +176,16 @@ class GridActivity : AppCompatActivity() {
 //            return super.onKeyDown(i, keyEvent);
 //        }
 
-    private fun write() {
-        val dialogProperties = DialogProperties()
-        dialogProperties.selection_mode = 0;
-        dialogProperties.selection_type = 0;
-        dialogProperties.offset = app.folderController.getDirectory(getString(R.string.key_restore_folder)).toFile()
-        dialogProperties.root = File(DialogConfigs.DIRECTORY_SEPERATOR)
 
-        dialogProperties.error_dir = File(DialogConfigs.DEFAULT_DIR);
-        dialogProperties.extensions = arrayOf("bin")
+    private fun openFile(key: String) = object : ActivityResultContracts.OpenDocument() {
 
-        val filePickerDialog = FilePickerDialog(this, dialogProperties);
-        filePickerDialog.setTitle("Select a File");
-        filePickerDialog.setDialogSelectionListener(DialogSelectionListener() {
-            fun onSelectedFilePaths(strArr: Array<String>) {
-                if (strArr.isNotEmpty()) {
-                    app.writeFile = strArr[0]
-                    app.currentAction = ActionEnum.WRITE
+        override fun createIntent(context: Context, input: Array<String>): Intent {
+            val startingUriString = FolderController(context).getDirectory(key)
+            val startingUri = DocumentFile.fromTreeUri(context, Uri.parse(startingUriString))
+            return super.createIntent(context, input).putExtra(EXTRA_INITIAL_URI, startingUri?.uri)
+        }
 
-                    Log.d(this::class.simpleName, "[write] got filename: " + app.writeFile)
 
-                    startActivity(confirmation)
-                }
-            }
-        })
-        filePickerDialog.show()
     }
-
-
 
 }

@@ -55,10 +55,11 @@ class SettingsFragment : PreferenceFragmentCompat() {
 
     private fun registerFolderActivity(key: String) = registerForActivityResult(ActivityResultContracts.OpenDocumentTree()) { uri: Uri ->
         Log.d(this::class.simpleName, "[registerFolderActivity] key $key")
-        Log.d(this::class.simpleName, "[backupFolder] uri $uri")
-        Log.d(this::class.simpleName, "[backupFolder] uri.path ${uri.path}")
+        Log.d(this::class.simpleName, "[registerFolderActivity] uri $uri")
+        Log.d(this::class.simpleName, "[registerFolderActivity] uri.path ${uri.path}")
+        Log.d(this::class.simpleName, "[registerFolderActivity] uri.encodedPath ${uri.encodedPath}")
 
-        preferenceManager.sharedPreferences.edit().putString(key, uri.path).apply()
+        preferenceManager.sharedPreferences.edit().putString(key, uri.toString()).apply()
     }
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {

@@ -13,6 +13,8 @@ import android.widget.Toast
 import androidx.preference.PreferenceManager
 import dev.mlferreira.m3.NFCApp
 import dev.mlferreira.m3.R
+import dev.mlferreira.m3.entity.Amiibo
+import dev.mlferreira.m3.entity.Bank
 import dev.mlferreira.m3.nfc.N2Tag
 import dev.mlferreira.m3.rest.FolderController
 import dev.mlferreira.m3.util.ActionEnum
@@ -114,6 +116,26 @@ class NFCTapActivity : AppCompatActivity() {
                 }
                 return Intent(this, GridActivity::class.java)
             }
+            ActionEnum.EMPTY -> {
+                Log.d(this::class.simpleName, "[handleNFC] emptying bank ${app.writeBank}")
+
+                // TODO ?????????????????????????
+                val hexStringToByteArray = hexStringToByteArray(String(CharArray(1080)).replace("\u0000", "F"))
+                Log.d(this::class.simpleName, "[handleNFC] emptying hex $hexStringToByteArray")
+
+                if (doWrite(0, app.writeBank, hexStringToByteArray)) {
+
+                    val bArr = ByteArray(8)
+                    System.arraycopy(hexStringToByteArray, 84, bArr, 0, bArr.size)
+
+                    val FromStatueId: Amiibo = Amiibo()
+                    System.arraycopy(hexStringToByteArray, 0, bArr, 0, bArr.size)
+
+                    app.banks[app.writeBank] = Bank(Amiibo(), bArr)
+                }
+
+                return Intent(this, GridActivity::class.java)
+            }
             else -> {
                 Log.w(this::class.simpleName, "[handleNFC] action not mapped - ${app.currentAction}")
                 Intent(this, MenuActivity::class.java)
@@ -132,28 +154,31 @@ class NFCTapActivity : AppCompatActivity() {
             return false
         }
 
-        val pref = PreferenceManager.getDefaultSharedPreferences(this)
-        val fastWrite = pref.getBoolean(getString(R.string.key_fast_write), true)
-        Log.w(this::class.simpleName, "[write] using fast write: $fastWrite")
-
         val bArr = ByteArray(540)
         System.arraycopy(data, 0, bArr, 0, 540)
 
         // TODO: check tagAuth()?
 
+        return doWrite(0, app.writeBank, bArr)
+
+    }
+
+    private fun doWrite(addr: Int, bank: Int, content: ByteArray): Boolean {
+        val pref = PreferenceManager.getDefaultSharedPreferences(this)
+        val fastWrite = pref.getBoolean(getString(R.string.key_fast_write), true)
+        Log.w(this::class.simpleName, "[doWrite] using fast write: $fastWrite")
 
         if (fastWrite) {
-            if (nfcNtag!!.fastWrite(0, app.writeBank, bArr)) {
-                showErrorAndReturn("Could not write amiibo to bank #" + (app.writeBank and 255) + 1)
+            if (nfcNtag!!.fastWrite(addr, bank, content)) {
+                showErrorAndReturn("Could not write to bank #" + (bank and 255) + 1)
                 return false
             }
         } else {
-            if (nfcNtag!!.write(0, app.writeBank, bArr)) {
-                showErrorAndReturn("Could not write amiibo to bank #" + (app.writeBank and 255) + 1)
+            if (nfcNtag!!.write(addr, bank, content)) {
+                showErrorAndReturn("Could not write to bank #" + (bank and 255) + 1)
                 return false
             }
         }
-
 
         return true
     }
@@ -162,6 +187,20 @@ class NFCTapActivity : AppCompatActivity() {
         Log.e(this::class.simpleName, "[showErrorAndReturn] $msg")
         Toast.makeText(this, (msg ?: "ERROR!"), Toast.LENGTH_LONG).show()
         this.finish()
+    }
+
+    // ?????????????????????????????????????????????????
+    // TODO
+    fun hexStringToByteArray(str: String): ByteArray {
+        val length = str.length
+        val bArr = ByteArray(length / 2)
+        var i = 0
+        while (i < length) {
+            bArr[i / 2] =
+                ((Character.digit(str[i], 16) shl 4) + Character.digit(str[i + 1], 16)).toByte()
+            i += 2
+        }
+        return bArr
     }
 
 }

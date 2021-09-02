@@ -2,6 +2,7 @@ package dev.mlferreira.m3.rest
 
 import android.content.Context;
 import android.net.Uri
+import android.util.Log
 import androidx.core.net.toFile
 import androidx.preference.PreferenceManager
 import dev.mlferreira.m3.R
@@ -16,8 +17,17 @@ class FolderController(
 ) {
 
 
-    fun getDirectory(key: String): Uri
-        = Uri.parse(PreferenceManager.getDefaultSharedPreferences(context).getString(key, createDefault(key)))
+    fun getDirectory(key: String): String {
+        Log.d(this::class.simpleName, "[getDirectory] started")
+
+        val path = PreferenceManager
+            .getDefaultSharedPreferences(context)
+            .getString(key, createDefault(key))
+
+        Log.d(this::class.simpleName, "[getDirectory] path: $path")
+
+        return path ?: createDefault(key)
+    }
 
     private fun createDefault(key: String) = context.dataDir.absolutePath + "/" + key
 
@@ -39,7 +49,7 @@ class FolderController(
     }
 
     fun writeBlobToFile(fileName: String, content: ByteArray, key: String): Boolean {
-        val directory = getDirectory(key).toFile()
+        val directory = File(getDirectory(key))
 
         if (directory.mkdirs()) {
             return false
