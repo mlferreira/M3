@@ -16,6 +16,10 @@ class Amiibo (
     val context: Context? = null
 ) {
 
+    init {
+        Log.d(this::class.simpleName, "Amiibo $data ")
+    }
+
     var id: String = data
         set(value) {
             var hex = value
@@ -49,7 +53,9 @@ class Amiibo (
 
 
 
-    constructor(bArr: ByteArray, context: Context?) : this(bArr.toHex(), context)
+    constructor(bArr: ByteArray, context: Context?) : this(bArr.toHex(), context) {
+        Log.d(this::class.simpleName, "[hex constructor] $id")
+    }
 
     constructor(jsonObject: JsonObject) : this(jsonObject.getAsJsonPrimitive("id").asString) {
         Log.d(this::class.simpleName, "[json constructor] $id")
@@ -65,6 +71,7 @@ class Amiibo (
         type: String,
         amiiboSeries: String,
     ) : this (id) {
+        Log.d(this::class.simpleName, "[full constructor] $id")
         this.name = name
         this.character = character
     }

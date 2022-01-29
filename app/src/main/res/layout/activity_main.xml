@@ -10,13 +10,13 @@
 >
 
     <ImageView
-        android:id="@+id/n2logo"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
+        android:id="@+id/applogo"
+        android:layout_width="217dp"
+        android:layout_height="207dp"
         android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
         android:layout_marginTop="56dip"
-        android:src="@drawable/n2logo" />
+        android:src="@drawable/m3logo" />
 
     <TextView
         android:id="@+id/welcome"
@@ -27,7 +27,7 @@
         android:textAppearance="@style/TextAppearance.AppCompat.Display1"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="44dp"
-        android:layout_below="@+id/n2logo" />
+        android:layout_below="@+id/applogo" />
 
     <TextView
         android:id="@+id/scan_tag"

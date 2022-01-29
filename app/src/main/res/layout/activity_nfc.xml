@@ -30,10 +30,10 @@
         tools:context=".activity.MenuActivity">
 
         <ImageView
-            android:id="@+id/n2logo"
+            android:id="@+id/m3logo"
             android:layout_width="125dp"
             android:layout_height="86dp"
-            android:src="@drawable/n2logo" />
+            android:src="@drawable/m3logo" />
 
         <RelativeLayout
             android:layout_width="wrap_content"

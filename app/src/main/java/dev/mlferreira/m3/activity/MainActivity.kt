@@ -82,4 +82,8 @@ class MainActivity : AppCompatActivity() {
         startActivity(Intent(this, SettingsActivity::class.java))
     }
 
+    fun openNFCSettings(view: View) {
+        startActivity(Intent("android.settings.NFC_SETTINGS"))
+    }
+
 }

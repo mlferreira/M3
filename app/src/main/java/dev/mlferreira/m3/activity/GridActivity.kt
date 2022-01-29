@@ -180,6 +180,7 @@ class GridActivity : AppCompatActivity() {
     private fun openFile(key: String) = object : ActivityResultContracts.OpenDocument() {
 
         override fun createIntent(context: Context, input: Array<String>): Intent {
+            Log.d(this::class.simpleName, "[openFile] [createIntent] STARTED - $key")
             val startingUriString = FolderController(context).getDirectory(key)
             val startingUri = DocumentFile.fromTreeUri(context, Uri.parse(startingUriString))
             return super.createIntent(context, input).putExtra(EXTRA_INITIAL_URI, startingUri?.uri)
