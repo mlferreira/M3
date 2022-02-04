@@ -35,6 +35,7 @@ class AmiiboManager(
         val amiibo: Amiibo? = getFromFile(id)
 
         if (amiibo != null) {
+            Log.d(this::class.simpleName, "[getAmiibo] found amiibo in file ${amiibo.name} ${amiibo.id}")
             return StaticCall(amiibo)
         }
 
@@ -42,7 +43,6 @@ class AmiiboManager(
     }
 
     fun getImage(id: String): Call<ResponseBody?> {
-
         val image: ByteArray? = getImageFromFile(id)
 
         if (image != null) {
@@ -53,6 +53,8 @@ class AmiiboManager(
     }
 
     private fun getImageFromFile(id: String): ByteArray? {
+        if (id == Amiibo.DUMMY) return null
+
         var amiibo: ByteArray? = null
 
         val dataFile = File(context.cacheDir, "$id${Amiibo.IMAGE_EXTENSION}")
@@ -65,10 +67,13 @@ class AmiiboManager(
     }
 
     private fun getFromFile(id: String): Amiibo? {
+        if (id == Amiibo.DUMMY) return null
+
         var amiibo: Amiibo? = null
         val dataFile = File(context.cacheDir, "$id${Amiibo.DATA_EXTENSION}")
 
         if (dataFile.exists()) {
+            Log.d(this::class.simpleName, " [getFromFile] ${JsonParser.parseString(dataFile.readText()).asJsonObject}")
             amiibo = Amiibo(JsonParser.parseString(dataFile.readText()).asJsonObject)
         }
 
@@ -92,10 +97,14 @@ class AmiiboManager(
 
     private fun cacheAmiibo(file: File): Callback<Amiibo?> = object : Callback<Amiibo?> {
         override fun onResponse(call: Call<Amiibo?>, response: Response<Amiibo?>) {
+            Log.d(this::class.simpleName, "[cacheAmiibo] [onResponse] file path: ${file.absolutePath}")
             if (response.isSuccessful) {
                 response.body()
                     ?.toJsonString()
-                    ?.let { file.writeText(it) }
+                    ?.let {
+                        Log.d(this::class.simpleName, "[cacheAmiibo] [onResponse] [let] $it")
+                        file.writeText(it)
+                    }
             }
         }
         override fun onFailure(call: Call<Amiibo?>, th: Throwable) {

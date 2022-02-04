@@ -17,7 +17,8 @@ class Amiibo (
 ) {
 
     init {
-        Log.d(this::class.simpleName, "Amiibo $data ")
+        Log.d(this::class.simpleName, "[Amiibo init] Amiibo $data ")
+        Log.d(this::class.simpleName, "[Amiibo init] substring ${data.substring(12, 14)} ")
     }
 
     var id: String = data
@@ -33,6 +34,8 @@ class Amiibo (
             } else if (hex.length > 16) {
                 hex = hex.substring(0, 16)
             }
+            Log.d(this::class.simpleName, "[Amiibo id set] substring ${hex.substring(12, 14)} ")
+
             field = hex
         }
 
@@ -82,12 +85,12 @@ class Amiibo (
         if (name == null) return null
 
         val map = mapOf(
-            "id" to "id",
+            "id" to id,
             "name" to name,
-            "gameSeries" to gameSeries,
+            "gameSeries" to gameSeries?.name,
             "character" to character,
-            "type" to type,
-            "amiiboSeries" to amiiboSeries,
+            "type" to type?.name,
+            "amiiboSeries" to amiiboSeries?.name,
             )
 
         return JSONObject(map).toString()

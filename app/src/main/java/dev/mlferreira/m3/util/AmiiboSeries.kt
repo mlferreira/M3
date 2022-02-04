@@ -24,7 +24,9 @@ enum class AmiiboSeries(var hex: String, name: String) {
     DIABLO("16", "Diablo");
 
     companion object {
-        fun fromId(id: String): AmiiboSeries? = values().find { it.hex == id }
+        fun fromId(id: String): AmiiboSeries? {
+            return values().find { it.hex == id }
+        }
         fun fromId(id: Int): AmiiboSeries? {
             return when (id) {
                 0 -> SUPER_SMASH_BROS
