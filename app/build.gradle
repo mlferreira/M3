@@ -15,7 +15,7 @@ android {
         applicationId "dev.mlferreira.m3"
         minSdk 27
         targetSdk 30
-        versionCode 2
+        versionCode 3
         versionName "0.1"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
